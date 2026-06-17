@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factory &mdash; Call Companion v15</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0e;--bg2:#141416;--bg3:#1c1c20;--bg4:#242428;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#eeecea;--text2:#9a9896;--text3:#585654;
+  --accent:#4f8ef7;--accent-dim:rgba(79,142,247,0.13);--accent-b:rgba(79,142,247,0.28);
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,0.10);--green-b:rgba(62,207,142,0.25);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.10);--amber-b:rgba(245,166,35,0.25);
+  --red:#e55050;--red-dim:rgba(229,80,80,0.10);--red-b:rgba(229,80,80,0.25);
+  --teal:#38bdf8;--teal-dim:rgba(56,189,248,0.10);--teal-b:rgba(56,189,248,0.25);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.10);--purple-b:rgba(167,139,250,0.25);
+  --r:8px;--rl:12px;
+}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;height:100vh;overflow:hidden}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:4px;height:50px;overflow-x:auto;flex-shrink:0}
+.logo{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;color:var(--accent);letter-spacing:.14em;opacity:.75;margin-right:16px;white-space:nowrap}
+.nav-btn{height:32px;padding:0 12px;border-radius:var(--r);border:1px solid transparent;background:none;color:var(--text3);cursor:pointer;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;white-space:nowrap;transition:all .12s}
+.nav-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
+.nav-btn.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-b)}
+.body-wrap{display:flex;height:calc(100vh - 50px);overflow:hidden}
+.main{flex:1;overflow-y:auto;padding:20px 24px 60px}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.inner{max-width:1200px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+.view:not(#view-flow){max-width:860px;margin:0 auto}
+
+/* ── REFERENCE TABS ─────── */
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.sec-num{font-family:"DM Mono",monospace;font-size:11px;color:var(--accent);opacity:.7}
+.sec-title{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.sec-sub{font-size:12px;color:var(--text3);margin-left:auto;font-family:"DM Mono",monospace}
+.label{font-size:13px;font-weight:600;color:var(--text2);margin:22px 0 10px}
+.label:first-child{margin-top:0}
+.lmono{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:8px;margin-top:16px}
+.lmono:first-child{margin-top:0}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:15px 17px;margin-bottom:8px;transition:border-color .12s}
+.card:hover{border-color:var(--border2)}
+.cbody{font-size:14px;line-height:1.7}.cbody em{color:var(--text2);font-style:italic}
+.ctag{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px}
+.q{color:var(--green);font-weight:500}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:680px){.cgrid{grid-template-columns:1fr}}
+.plist{list-style:none;display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.plist li{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--green);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--green);font-weight:500;line-height:1.5}
+.plist li.n{color:var(--text);border-left-color:var(--border2)}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+@media(max-width:680px){.bgrid{grid-template-columns:1fr}}
+.bkt{border-radius:var(--rl);padding:13px 15px;border:1px solid}
+.ba{background:var(--amber-dim);border-color:var(--amber-b)}.bt{background:var(--teal-dim);border-color:var(--teal-b)}.bp{background:var(--purple-dim);border-color:var(--purple-b)}
+.blbl{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.ba .blbl{color:var(--amber)}.bt .blbl{color:var(--teal)}.bp .blbl{color:var(--purple)}
+.btxt{font-size:12px;line-height:1.5}
+.ba .btxt{color:#d4a06a}.bt .btxt{color:#7ec8ea}.bp .btxt{color:#b9a4e8}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.tag{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500;border:1px solid}
+.tg{background:var(--green-dim);color:var(--green);border-color:var(--green-b)}
+.tr{background:var(--red-dim);color:var(--red);border-color:var(--red-b)}
+.ta{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-b)}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.twocol{grid-template-columns:1fr}}
+.colh{font-size:11px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%}
+.nogo{background:var(--red-dim);border:1px solid var(--red-b);border-radius:var(--r);padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nogo .nl{font-family:"DM Mono",monospace;font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.nblk{background:var(--red-dim);border:1px solid var(--red-b);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#e58080;line-height:1.6;margin-top:8px}
+.nblk strong{display:block;font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.cab{border-color:var(--accent-b)!important}.cgb{border-color:var(--green-b)!important}.crb{border-color:rgba(229,80,80,.3)!important}
+.bbtn{background:none;border:none;color:var(--text3);font-family:"DM Sans",sans-serif;font-size:12px;cursor:pointer;padding:0 0 16px;display:flex;align-items:center;gap:5px}
+.bbtn:hover{color:var(--text2)}.bbtn svg{width:14px;height:14px}
+.ogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+@media(max-width:680px){.ogrid{grid-template-columns:1fr 1fr}}
+.obtn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif;font-weight:500;cursor:pointer;text-align:left;transition:all .12s}
+.obtn:hover{background:var(--bg3);border-color:var(--border2)}
+.obtn.hl{background:var(--amber-dim);border-color:var(--amber-b);color:var(--amber)}
+.aim-block{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:680px){.aim-block{grid-template-columns:1fr}}
+.ac{border-radius:var(--rl);padding:13px 15px;border:1px solid}
+.ac.aa{background:var(--green-dim);border-color:var(--green-b)}
+.ac.ai{background:var(--teal-dim);border-color:var(--teal-b)}
+.ac.am{background:var(--purple-dim);border-color:var(--purple-b)}
+.ac.aa .al{color:var(--green)}.ac.aa .at{color:#9eecd1}
+.ac.ai .al{color:var(--teal)}.ac.ai .at{color:#a5d8f0}
+.ac.am .al{color:var(--purple)}.ac.am .at{color:#c9bbfc}
+.al{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.at{font-size:13px;line-height:1.55}
+.fblock{font-size:13px;color:var(--text2);padding:10px 14px;border-left:2px solid var(--border2);line-height:1.55;margin-top:4px}
+.fblock strong{display:block;font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px}
+
+/* ── LIVE FLOW ──────────── */
+.live-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.live-main{min-width:0}
+.live-side{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;max-height:calc(100vh - 90px);overflow-y:auto;padding-right:2px}
+.live-side::-webkit-scrollbar{width:4px}
+.live-side::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+@media(max-width:980px){.live-layout{grid-template-columns:1fr}.live-side{position:static;max-height:none}}
+.side-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:13px 14px}
+
+/* Discovery gate bar */
+.gate-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px;margin-bottom:12px}
+.gate-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.gate-lbl{font-family:"DM Mono",monospace;font-size:11px;font-weight:500}
+.gate-st{font-size:12px;color:var(--text3)}
+.gate-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.gate-fill{height:100%;border-radius:3px;transition:width .3s,background .3s;width:0%}
+.gate-items{display:flex;gap:5px;flex-wrap:wrap}
+.gate-item{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:500;border:1px solid var(--border);background:var(--bg3);color:var(--text3)}
+.gate-item.done{background:var(--green-dim);border-color:var(--green-b);color:var(--green)}
+
+/* Progress strip */
+.progress-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px;margin-bottom:12px}
+.progress-label{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+.progress-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media(max-width:760px){.progress-steps{grid-template-columns:repeat(3,1fr)}}
+.progress-step{border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;background:var(--bg2)}
+.progress-step.done{background:var(--green-dim);border-color:var(--green-b)}
+.progress-step.active{background:var(--accent-dim);border-color:var(--accent-b)}
+.ps-k{font-family:"DM Mono",monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.ps-v{font-size:11px;color:var(--text2);line-height:1.3}
+.progress-step.done .ps-k,.progress-step.done .ps-v{color:var(--green)}
+.progress-step.active .ps-k,.progress-step.active .ps-v{color:var(--accent)}
+
+/* Flow steps */
+.fstep{animation:fadeUp .15s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.bc{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.bci{font-size:11px;color:var(--text3);font-family:"DM Mono",monospace}
+.bci.on{color:var(--accent);font-weight:500}
+.say{background:var(--bg2);border:1px solid var(--green-b);border-radius:var(--rl);padding:16px 18px;margin-bottom:14px}
+.say-lbl{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:8px;opacity:.8}
+.say-txt{font-size:15px;color:var(--green);font-weight:500;line-height:1.65}
+.auto-pain{color:var(--amber);font-weight:600}
+.snote{font-size:12px;color:var(--text3);margin-bottom:14px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);line-height:1.6}
+.rlbl{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:8px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+@media(max-width:680px){.rgrid{grid-template-columns:1fr}}
+.rbtn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;color:var(--text2);font-size:13px;font-family:"DM Sans",sans-serif;cursor:pointer;text-align:left;line-height:1.4;transition:all .12s}
+.rbtn:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+.rbtn.rp{border-color:var(--amber-b);color:var(--amber);background:var(--amber-dim)}
+.rbtn.ro{border-color:rgba(229,80,80,.25);color:#e58080;background:var(--red-dim)}
+.rbtn.rg{border-color:var(--green-b);color:var(--green);background:var(--green-dim)}
+.snav{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.sbk{background:none;border:none;color:var(--text3);font-family:"DM Sans",sans-serif;font-size:12px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+.sbk:hover{color:var(--text2)}
+.sbk svg{width:14px;height:14px}
+.sfwd{background:var(--accent-dim);border:1px solid var(--accent-b);border-radius:var(--r);color:var(--accent);font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;cursor:pointer;padding:7px 14px;display:inline-flex;align-items:center;gap:6px;transition:all .12s}
+.sfwd:hover{background:rgba(79,142,247,.2)}
+.gate{background:var(--bg2);border:2px dashed var(--border2);border-radius:var(--rl);padding:24px 20px;text-align:center;margin-top:12px}
+.gate-icon{font-size:28px;margin-bottom:10px}
+.gate-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.gate-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px}
+.gate-miss{font-size:12px;color:var(--text2);margin-top:8px;text-align:left;display:inline-block}
+.gate-miss strong{color:var(--text)}
+.gate-btn{background:none;border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:"DM Sans",sans-serif;font-size:13px;cursor:pointer;padding:8px 18px;margin-top:12px}
+.gate-btn:hover{color:var(--text)}
+
+/* Objection drawer */
+.odrawer{background:var(--bg2);border:1px solid var(--amber-b);border-radius:var(--rl);padding:16px 18px;margin-top:14px;animation:fadeUp .2s ease}
+.odlbl{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:12px}
+.oclose{background:none;border:none;color:var(--text3);font-family:"DM Sans",sans-serif;font-size:12px;cursor:pointer;padding:0;margin-top:14px;display:inline-flex;align-items:center;gap:5px}
+.oclose:hover{color:var(--text2)}
+.sline{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--amber);font-weight:500;line-height:1.5;margin-bottom:6px;cursor:pointer;position:relative;user-select:none}
+.sline:hover{border-color:var(--amber-b);background:var(--bg4)}
+.sline.copied::after{content:"copied";position:absolute;top:8px;right:10px;font-size:10px;font-family:"DM Mono",monospace;color:var(--green);font-weight:500}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media(max-width:680px){.sgrid{grid-template-columns:1fr}}
+
+/* Side panel */
+.flow-actions{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:10px}
+.reset-btn{background:var(--red-dim);border:1px solid var(--red-b);border-radius:var(--r);color:var(--red);font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;cursor:pointer;padding:7px 12px;white-space:nowrap}
+.mini-summary{font-size:12px;color:var(--text3);line-height:1.5}
+.matrix-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:13px 14px}
+.matrix-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.matrix-label{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.matrix-status{font-size:12px;color:var(--text2);font-weight:600}
+.matrix-band{font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.5}
+.matrix-next{font-size:11px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber-b);border-radius:var(--r);padding:7px 9px;margin-bottom:8px;line-height:1.45}
+.matrix-cats{display:grid;grid-template-columns:1fr;gap:6px}
+.matrix-cat{border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);padding:9px}
+.matrix-cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.matrix-cat-title{font-size:12px;font-weight:600}
+.matrix-cat-score{font-family:"DM Mono",monospace;font-size:10px;color:var(--text3)}
+.matrix-items{display:flex;flex-direction:column;gap:3px}
+.matrix-item{border:1px solid var(--border);background:var(--bg3);border-radius:6px;color:var(--text3);font-family:"DM Sans",sans-serif;font-size:11px;text-align:left;padding:5px 8px;cursor:pointer;transition:all .12s}
+.matrix-item:hover{border-color:var(--border2);color:var(--text2)}
+.matrix-item.done{background:var(--green-dim);border-color:var(--green-b);color:var(--green)}
+.matrix-item.manual::after{content:" manual";font-family:"DM Mono",monospace;font-size:9px;color:var(--text3);margin-left:4px}
+.qual-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.qual-label{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.qual-status{font-size:11px;color:var(--text3)}
+.qual-pills{display:flex;flex-wrap:wrap;gap:4px}
+.qpill{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-weight:500}
+.qpill.done{background:var(--green-dim);border-color:var(--green-b);color:var(--green)}
+.qpill.warn{background:var(--amber-dim);border-color:var(--amber-b);color:var(--amber)}
+.capture-grid{display:grid;grid-template-columns:1fr;gap:5px}
+.capture-item{border:1px solid var(--border);background:var(--bg3);border-radius:var(--r);padding:8px 10px}
+.capture-k{font-family:"DM Mono",monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.capture-v{font-size:12px;color:var(--text3);line-height:1.4;min-height:16px}
+.capture-v.ok{color:var(--text)}
+.note-label{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:6px}
+.note-input{width:100%;min-height:60px;resize:vertical;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:"DM Sans",sans-serif;font-size:13px;line-height:1.5;padding:8px 10px;outline:none}
+.note-input:focus{border-color:var(--accent-b)}
+
+/* Summary card */
+.summary-card{background:var(--bg2);border:1px solid var(--accent-b);border-radius:var(--rl);padding:14px 18px;margin-bottom:14px}
+.summary-card.end{border-color:var(--green-b);background:var(--green-dim)}
+.summary-title{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px}
+.summary-card.end .summary-title{color:var(--green)}
+.summary-text{font-size:13px;color:var(--text2);line-height:1.6}
+.summary-text strong{color:var(--text)}
+.copy-btn{margin-top:10px}
+
+.hidden{display:none}
+
+/* ── PAIN EXTRACTION PROBE ── */
+.probe-panel{background:var(--bg2);border:1px solid var(--teal-b);border-radius:var(--rl);padding:16px 18px;margin-top:14px;animation:fadeUp .2s ease}
+.probe-lbl{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:12px}
+.probe-cats{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:4px}
+.probe-cat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;color:var(--text2);font-size:13px;font-family:"DM Sans",sans-serif;cursor:pointer;text-align:left;line-height:1.4;transition:all .12s}
+.probe-cat:hover{border-color:var(--teal-b);color:var(--teal);background:var(--bg4)}
+.probe-cat.on{background:var(--teal-dim);border-color:var(--teal-b);color:var(--teal)}
+.probe-note{font-size:12px;color:var(--text3);padding:8px 12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);margin:10px 0;line-height:1.6}
+.probe-q{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--teal);font-weight:500;line-height:1.5;margin-bottom:6px;cursor:pointer;position:relative;user-select:none}
+.probe-q:hover{border-color:var(--teal-b);background:var(--bg4)}
+.probe-q.copied::after{content:"copied";position:absolute;top:8px;right:10px;font-size:10px;font-family:"DM Mono",monospace;color:var(--green);font-weight:500}
+.dig-btn{background:var(--teal-dim);border:1px solid var(--teal-b);border-radius:var(--r);color:var(--teal);font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;cursor:pointer;padding:6px 14px;display:inline-flex;align-items:center;gap:5px;transition:all .12s;margin-top:4px}
+.dig-btn:hover{background:rgba(56,189,248,.18)}
+.dig-btn.on{background:var(--teal-dim);opacity:.7}
+</style>
+</head>
+<body>
+<div style="display:flex;flex-direction:column;height:100vh;overflow:hidden">
+<nav class="topbar">
+  <div class="logo">FACTORY</div>
+  <button class="nav-btn active" onclick="showView('flow')" id="nav-flow">Live Call</button>
+  <button class="nav-btn" onclick="showView('opener')" id="nav-opener">Opener</button>
+  <button class="nav-btn" onclick="showView('discovery')" id="nav-discovery">Discovery</button>
+  <button class="nav-btn" onclick="showView('qualify')" id="nav-qualify">Qualify</button>
+  <button class="nav-btn" onclick="showView('objections')" id="nav-objections">Objections</button>
+  <button class="nav-btn" onclick="showView('book')" id="nav-book">Book It</button>
+</nav>
+<div class="body-wrap"><div class="main"><div class="inner">
+
+<!-- ── LIVE CALL ─────────────────────────────────────────── -->
+<div id="view-flow" class="view active">
+  <div class="live-layout">
+    <div class="live-main">
+      <div class="gate-bar">
+        <div class="gate-row">
+          <span class="gate-lbl" id="gate-lbl" style="color:var(--text3)">Discovery gate: 0 / 4</span>
+          <span class="gate-st" id="gate-st">Capture process, pain, impact and priority before booking</span>
+        </div>
+        <div class="gate-track"><div class="gate-fill" id="gate-fill"></div></div>
+        <div class="gate-items" id="gate-items"></div>
+        <div class="flow-actions" style="margin-top:10px">
+          <div class="mini-summary" id="mini-summary">Summary will build as you click through the call.</div>
+          <button class="reset-btn" onclick="resetCall()">Reset call</button>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">Call progress</div>
+        <div class="progress-steps" id="progress-steps"></div>
+      </div>
+      <div id="flow-content"></div>
+      <div id="odrawer" class="odrawer hidden">
+        <div class="odlbl">Objection &mdash; handle and come back</div>
+        <div id="odrawer-body"></div>
+        <button class="oclose" onclick="closeDrawer()">Close &mdash; back to flow</button>
+      </div>
+      <div id="probe-panel" class="probe-panel hidden">
+        <div class="probe-lbl">&#x1F50D; Dig deeper &mdash; extract the admission</div>
+        <div class="probe-cats" id="probe-cats"></div>
+        <div id="probe-questions"></div>
+        <button class="oclose" onclick="closeProbe()">Close &mdash; back to flow</button>
+      </div>
+    </div>
+    <aside class="live-side">
+      <div class="matrix-wrap side-card">
+        <div class="matrix-head"><div class="matrix-label">Factory scoring matrix</div><div class="matrix-status" id="matrix-status">0 / 25</div></div>
+        <div id="matrix-band" class="matrix-band">Target: <strong>20+</strong> for a world-class booked demo call.</div>
+        <div id="matrix-next" class="matrix-next hidden"></div>
+        <div class="matrix-cats" id="matrix-cats"></div>
+      </div>
+      <div class="side-card">
+        <div class="qual-head"><div class="qual-label">Book demo gate</div><div class="qual-status" id="qual-status">0 / 7 captured</div></div>
+        <div class="qual-pills" id="qual-pills"></div>
+      </div>
+      <div class="side-card">
+        <div class="note-label" style="margin-bottom:10px">Live capture</div>
+        <div class="capture-grid" id="capture-grid"></div>
+      </div>
+      <div class="side-card">
+        <div class="note-label">Exact words / notes</div>
+        <textarea id="call-notes" class="note-input" oninput="saveNotes()" placeholder="Type exact words they say."></textarea>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ── OPENER ─────────────────────────────────────────────── -->
+<div id="view-opener" class="view">
+  <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Opener</span><span class="sec-sub">short, relevant, then shut up</span></div>
+  <div class="label">Standard cold call</div>
+  <div class="card"><div class="cbody"><span class="q">"Hey [Name], it's James from Factory. Sorry for the out-of-the-blue call &mdash; have I caught you at a bad time?"</span><br><br><em>If okay:</em><br><br><span class="q">"Nice one. We work with fabrication shops that are still managing quoting and jobs through spreadsheets, paper job cards or a few disconnected systems. How are you handling all that at the moment?"</span></div></div>
+  <div class="cgrid">
+    <div class="card"><div class="ctag">Transferred opener</div><div class="cbody"><span class="q">"Hey [Name], it's James from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?"</span></div></div>
+    <div class="card"><div class="ctag">Rushed version</div><div class="cbody"><span class="q">"No worries &mdash; I'll be brief. We help fabrication shops tighten up quoting, job tracking and paperwork where things are still manual. How are you managing that at the moment?"</span></div></div>
+  </div>
+  <div class="label">They ask what Factory does</div>
+  <div class="card"><div class="cbody"><span class="q">"Factory was built by two brothers who ran their own fabrication shop &mdash; they couldn't find anything that worked the way fabrication actually works, so they built it. Your whole operation in one place: quoting, job tracking, invoicing, syncs into Xero or QuickBooks so no double entry. Not an ERP &mdash; no bloat, no six-month implementation. Just a fab shop tool."</span></div></div>
+  <div class="cgrid">
+    <div class="card"><div class="ctag">They have an ERP</div><div class="cbody"><span class="q">"Totally fair &mdash; usually the reason people still speak to us is the current setup works but there are still bits happening outside it. Is that kind of the case or is it genuinely running end to end?"</span></div></div>
+    <div class="card"><div class="ctag">Gatekeeper</div><div class="cbody"><span class="q">"It's around job tracking on the shop floor &mdash; is that something [Name] looks after?"</span><br><br><em>If their responsibility:</em> <span class="q">"Oh brilliant, you're exactly who I wanted to speak to."</span></div></div>
+  </div>
+</div>
+
+<!-- ── DISCOVERY ─────────────────────────────────────────── -->
+<div id="view-discovery" class="view">
+  <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Discovery</span><span class="sec-sub">process &rarr; pain &rarr; impact &rarr; priority</span></div>
+  <div class="label">Core 4-step flow</div>
+  <ul class="plist">
+    <li>"Talk me through it from when a job comes in to when it gets finished and invoiced. What happens first?"</li>
+    <li>"Out of that whole flow, what feels most manual or time-consuming day to day?"</li>
+    <li>"When that happens, what's the real effect &mdash; lost admin time, margin getting squeezed, jobs slipping, invoices delayed, or too much landing back on you?"</li>
+    <li>"How live is this for you at the moment &mdash; actively trying to tighten it up now, or more one for later?"</li>
+  </ul>
+  <div class="divider"></div>
+  <div class="label">Pain signals &mdash; dig in when you hear these</div>
+  <div class="tags"><span class="tag tg">spreadsheets</span><span class="tag tg">paper job cards</span><span class="tag tg">whiteboard</span><span class="tag tg">typing same thing twice</span><span class="tag tg">quoting takes ages</span><span class="tag tg">chasing for updates</span><span class="tag tg">can't track margins</span><span class="tag tg">all in one person's head</span><span class="tag tg">lost visibility on floor</span><span class="tag tg">invoicing late</span><span class="tag tg">stitched together</span><span class="tag tg">we're always looking at upgrading</span><span class="tag tg">no solution is perfect</span><span class="tag tg">things are fluid</span></div>
+  <div class="divider"></div>
+  <div class="label">Three pain buckets</div>
+  <div class="bgrid">
+    <div class="bkt ba"><div class="blbl">Money / margin</div><div class="btxt">Not knowing what they're making per job. Misquoting on labour. Finding out they've lost money after it's done.</div></div>
+    <div class="bkt bt"><div class="blbl">Visibility</div><div class="btxt">Can't see where jobs are without walking the floor. Customers ringing for updates. Jobs getting missed.</div></div>
+    <div class="bkt bp"><div class="blbl">Time / admin</div><div class="btxt">Double entry. Paper job cards getting lost. Too much time on paperwork. Invoicing late.</div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="label">Squeeze the pain</div>
+  <div class="cgrid">
+    <ul class="plist"><li class="n">"How often does that crop up in a normal week?"</li><li class="n">"Roughly what does that cost in time or mistakes?"</li><li class="n">"What have you tried to fix it in the past?"</li></ul>
+    <ul class="plist"><li class="n">"Who feels that the most &mdash; you, office, guys on the floor?"</li><li class="n">"If you got busier next quarter, would that hold up?"</li><li class="n">"If we could sort that out, what would it mean for the business?"</li></ul>
+  </div>
+  <div class="divider"></div>
+  <div class="label">If they say "we're always looking at upgrading our quoting system"</div>
+  <div class="card cab"><div class="cbody"><span class="q">"That's exactly it &mdash; talk me through what the quoting looks like now. What are you doing it in, and where does it get messy?"</span><br><br><em>This is a live buying signal. Don't acknowledge and move on &mdash; dig straight in.</em></div></div>
+  <div class="label">If they say "no solution is perfect"</div>
+  <div class="card cab"><div class="cbody"><span class="q">"That's really useful to hear. What's the bit that frustrates you most day to day?"</span></div></div>
+</div>
+
+<!-- ── QUALIFY ────────────────────────────────────────────── -->
+<div id="view-qualify" class="view">
+  <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Qualify</span><span class="sec-sub">accounts &rarr; stack &rarr; headcount &rarr; fit &rarr; DM</span></div>
+  <div class="label">Qualification order</div>
+  <ul class="plist">
+    <li class="n">"What are you using on the accounts side &mdash; Xero, QuickBooks, Sage, something like that?"</li>
+    <li class="n">"And aside from that, what else are you using to manage things &mdash; quoting, tracking, timesheets?"</li>
+    <li class="n">"How many staff have you got across the workshop and wider business?"</li>
+    <li class="n">"Are you mainly fabrication with some install, or is installation a major part of the business?"</li>
+    <li class="n">"Are you the person who'd normally make a call on something like this, or is there someone else?"</li>
+    <li class="n">"Who else should be on the demo so no one has to relay it second-hand?"</li>
+  </ul>
+  <div class="divider"></div>
+  <div class="label">Quick fit read</div>
+  <div class="twocol">
+    <div><div class="colh"><span class="dot" style="background:var(--green)"></span><span style="color:var(--green)">Good fit</span></div><div class="tags" style="flex-direction:column;align-items:flex-start"><span class="tag tg">5&ndash;50 staff</span><span class="tag tg">fabrication-primary</span><span class="tag tg">Xero / QuickBooks / MYOB</span><span class="tag tg">clear admin or margin pain</span><span class="tag tg">decision-maker on the call</span></div></div>
+    <div><div class="colh"><span class="dot" style="background:var(--red)"></span><span style="color:var(--red)">Qualify out</span></div><div class="tags" style="flex-direction:column;align-items:flex-start"><span class="tag tr">full ERP, happy with it</span><span class="tag tr">mainly install / site</span><span class="tag tr">under 5, no real pain</span><span class="tag ta">Sage (soft blocker)</span><span class="tag ta">can't own decision</span></div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="label">Known blockers</div>
+  <div class="card"><div class="ctag" style="color:var(--amber)">Sage &mdash; soft blocker, not automatic no</div><div class="cbody"><span class="q">"Just so I'm upfront &mdash; we integrate with Xero, QuickBooks and MYOB, but Sage isn't on the list yet. That matters because the accounting sync is one of the biggest parts of the platform. Without it you'd still have to run both in parallel."</span><br><br><em>If locked into Sage:</em> <span class="q">"So the honest question is whether Factory still saves enough time on the ops side to outweigh that final Sage entry. Knowing that piece stays manual &mdash; would it still be worth seeing?"</span></div></div>
+</div>
+
+<!-- ── OBJECTIONS ──────────────────────────────────────────── -->
+<div id="view-objections" class="view">
+  <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Objections</span><span class="sec-sub">acknowledge &rarr; isolate &rarr; move forward</span></div>
+  <div id="robj-list">
+    <div class="lmono">What are you hearing?</div>
+    <div class="ogrid">
+      <button class="obtn" onclick="showRObj('happy')">Happy as we are</button>
+      <button class="obtn hl" onclick="showRObj('sendit')">Send me something</button>
+      <button class="obtn" onclick="showRObj('busy')">Too busy</button>
+      <button class="obtn" onclick="showRObj('budget')">No budget</button>
+      <button class="obtn" onclick="showRObj('small')">Too small</button>
+      <button class="obtn" onclick="showRObj('system')">Have a system</button>
+      <button class="obtn" onclick="showRObj('erp')">Have an ERP</button>
+      <button class="obtn" onclick="showRObj('notme')">Not right person</button>
+      <button class="obtn" onclick="showRObj('nopain')">Everything's fine</button>
+      <button class="obtn" onclick="showRObj('think')">Need to think</button>
+      <button class="obtn" onclick="showRObj('trial')">Want a trial</button>
+      <button class="obtn" onclick="showRObj('rollout')">Too much effort</button>
+      <button class="obtn" onclick="showRObj('change')">Team won't use it</button>
+    </div>
+  </div>
+  <div id="robj-detail" class="hidden">
+    <button class="bbtn" onclick="hideRObj()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg>All objections</button>
+    <div id="robj-normal">
+      <div class="lmono" id="robj-title"></div>
+      <div class="aim-block">
+        <div class="ac aa"><div class="al">Acknowledge</div><div class="at" id="robj-ack"></div></div>
+        <div class="ac ai"><div class="al">Isolate</div><div class="at" id="robj-iso"></div></div>
+        <div class="ac am"><div class="al">Move forward</div><div class="at" id="robj-move"></div></div>
+      </div>
+      <div class="fblock"><strong>Fallback</strong><span id="robj-fallback"></span></div>
+    </div>
+    <div id="robj-sendit" class="hidden">
+      <div class="lmono" style="margin-top:0;color:var(--green)">Pain already logged &mdash; push for the meeting</div>
+      <div class="sline" onclick="copyLine(this,'Happy to send something.')">"Happy to send something."</div>
+      <div class="lmono">Isolate</div>
+      <div class="sgrid">
+        <div class="sline" onclick="copyLine(this,'Usually when someone says that after sharing what you just have - timing is off or I have not made it relevant enough yet. Which one is it?')">"Usually when someone says that after sharing what you just have &mdash; timing's off, or I haven't made it relevant enough yet. Which one is it?"</div>
+        <div class="sline" onclick="copyLine(this,'Just so I send something useful - what would you actually want it to cover?')">"Just so I send something useful &mdash; what would you actually want it to cover?"</div>
+      </div>
+      <div class="lmono">Move &mdash; push for the call</div>
+      <div class="sline" onclick="copyLine(this,'Look - the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it is not relevant, fair enough. Wednesday or Thursday?')">"Look &mdash; the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it's not relevant, fair enough. Wednesday or Thursday?"</div>
+      <div class="divider"></div>
+      <div class="lmono" style="color:var(--text3)">No pain yet &mdash; use it to open discovery</div>
+      <div class="sline" onclick="copyLine(this,'Just so I send something useful - what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?')">"Just so I send something useful &mdash; what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?"</div>
+      <div class="sline" onclick="copyLine(this,'Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes - Wednesday or Thursday?')">"Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes &mdash; Wednesday or Thursday?"</div>
+      <div class="divider"></div>
+      <div class="nblk"><strong>Never do this</strong>Do not ask for the email before pushing back at least once. The second you ask for the email, you have accepted the brush-off.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOOK IT ──────────────────────────────────────────────── -->
+<div id="view-book" class="view">
+  <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Book It</span><span class="sec-sub">recap pain &rarr; get agreement &rarr; lock the time</span></div>
+  <div class="label">Three-step pre-booking sequence</div>
+  <div class="cgrid">
+    <div class="card"><div class="ctag">Step 1 &mdash; Recap pain</div><div class="cbody"><span class="q">"Let me just check I've got this right &mdash; [pain], and that's creating [impact]."</span></div></div>
+    <div class="card"><div class="ctag">Step 2 &mdash; Get agreement</div><div class="cbody"><span class="q">"Sounds like there'd be value in seeing how other fabrication shops are tightening that up &mdash; fair?"</span></div></div>
+  </div>
+  <div class="card cgb"><div class="ctag" style="color:var(--green)">Step 3 &mdash; Lock the meeting (only after yes)</div><div class="cbody"><span class="q">"Good. Let's get something in the diary now and keep it focused on that."</span><br><br><em>Then narrow: week &rarr; day &rarr; time</em><br><span class="q">"Is next week generally better, or the week after?"</span><br><span class="q">"Tuesday or Thursday?"</span><br><span class="q">"10 or 2?"</span></div></div>
+  <div class="cgrid">
+    <div class="card"><div class="ctag">Confirm live</div><div class="cbody"><span class="q">"I'll send the Zoom invite now while we're on the phone. We'll focus on [pain], so it's not just a generic demo."</span></div></div>
+    <div class="card"><div class="ctag">Set context</div><div class="cbody"><span class="q">"And if you've got a blank quote or job sheet, send it across &mdash; I'll mock it up so you're seeing your actual layout."</span></div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="nogo"><span class="nl">Never</span><span class="tag tr">"I'll send you a booking link."</span><span class="tag tr">"Let me know when you're free."</span><span class="tag tr">"I'll leave it with you."</span><span class="tag tr">"Give me a shout if you want to chat."</span></div>
+</div>
+
+</div></div></div></div>
+
+<script>
+// ── FLOW DATA ─────────────────────────────────────────────────────────────────
+var FLOW = {
+  start:{stage:"contact",say:"Who answered?",note:"Start here. If reception answers, use the gatekeeper path. If the decision-maker picks up, go straight to opener.",resp:[
+    {l:"Reception / gatekeeper",n:"gk_open"},
+    {l:"Decision-maker direct",n:"opener",tone:"good",score:["open_courtesy"]}
+  ]},
+  gk_open:{stage:"contact",say:"Hi, it's James calling from Factory. I was hoping to speak with [Name] if they're available.",note:"Do not pitch reception unless they ask what it's regarding.",resp:[
+    {l:"They ask what it's regarding",n:"gk_context"},
+    {l:"They ask who you are / what company",n:"gk_context"},
+    {l:"They can transfer you",n:"opener_transfer",tone:"good"},
+    {l:"[Name] is unavailable",n:"gk_unavailable"},
+    {l:"Send an email / send info",n:"gk_send_info"},
+    {l:"Not the right person",n:"gk_find"}
+  ]},
+  gk_context:{stage:"contact",say:"It's regarding job tracking on the shop floor and how they're managing quotes, job cards and work through the workshop. Is [Name] the best person for that?",note:"Aim is relevance, not a pitch. Get enough context to be routed correctly.",resp:[
+    {l:"Yes, they put you through",n:"opener_transfer",tone:"good"},
+    {l:"They ask for more detail",n:"gk_more"},
+    {l:"Send an email",n:"gk_send_info"},
+    {l:"That's not [Name]'s area",n:"gk_find"},
+    {l:"They're unavailable",n:"gk_unavailable"}
+  ]},
+  gk_more:{stage:"contact",say:"We work with fabrication shops still using spreadsheets, paper job cards or whiteboards to track work through the floor. I only need 30 seconds with [Name] to see if it's relevant. Are they free at all?",note:"Do not get dragged into a pitch with reception. Outcome is transfer, direct details, or a clean callback.",resp:[
+    {l:"They transfer you",n:"opener_transfer",tone:"good"},
+    {l:"They're unavailable",n:"gk_unavailable"},
+    {l:"Send an email",n:"gk_send_info"},
+    {l:"Not interested / we're fine",n:"gk_pushback"}
+  ]},
+  gk_send_info:{stage:"contact",say:"Yeah I can send something through. Before I do, just so I send it to the right person - is [Name] the one who looks after job tracking or shop floor systems?",resp:[
+    {l:"Yes, they handle it",n:"gk_transfer_ask",tone:"good"},
+    {l:"No, someone else handles it",n:"gk_find"},
+    {l:"They give direct email",n:"gk_email"},
+    {l:"They won't transfer",n:"gk_unavailable"}
+  ]},
+  gk_transfer_ask:{stage:"contact",say:"Brilliant. Are they around for 30 seconds now? I can introduce myself quickly, then follow up properly if it makes sense.",resp:[
+    {l:"They transfer you",n:"opener_transfer",tone:"good"},
+    {l:"They're unavailable",n:"gk_unavailable"},
+    {l:"Email only",n:"gk_email"}
+  ]},
+  gk_find:{stage:"contact",say:"No worries. Who would normally look after quoting, job tracking or shop floor systems there?",note:"Get the right name if you can, then try for transfer, direct number, email or a callback window.",resp:[
+    {l:"They give the right name",n:"gk_transfer_newdm",tone:"good"},
+    {l:"Not sure who owns it",n:"gk_route_help"},
+    {l:"Send an email",n:"gk_email"}
+  ]},
+  gk_transfer_newdm:{stage:"contact",say:"Perfect, is [Name] around at all? Even just 30 seconds to introduce myself and I can follow up properly from there.",resp:[
+    {l:"They transfer you",n:"opener_transfer",tone:"good"},
+    {l:"They're unavailable",n:"gk_unavailable"},
+    {l:"Email only",n:"gk_email"}
+  ]},
+  gk_route_help:{stage:"contact",say:"No problem. It's usually whoever looks after quoting, workshop scheduling, or getting jobs through the floor. Is there an owner or workshop manager who would be best for that?",resp:[
+    {l:"They give a name",n:"gk_transfer_newdm",tone:"good"},
+    {l:"Still not sure",n:"gk_email"},
+    {l:"They're unavailable",n:"gk_unavailable"}
+  ]},
+  gk_unavailable:{stage:"contact",say:"No worries. What's the best way to get in front of them - direct number or email? And when are they usually easiest to catch?",note:"Still a win if you get a direct line, direct email, or a cleaner callback window.",resp:[
+    {l:"Gives direct number / best time",n:"gk_callback",tone:"good",cap:{next_step:"Direct callback route"}},
+    {l:"Email only",n:"gk_email",cap:{next_step:"Email only"}},
+    {l:"Try again later",n:"gk_callback",cap:{next_step:"Callback later"}}
+  ]},
+  gk_email:{stage:"contact",say:"Perfect, I'll send something through. Just so it's relevant, I'll mention it's around job tracking, paper job cards and visibility on the workshop floor. Appreciate your help.",resp:[{l:"End gatekeeper call",n:"end"}]},
+  gk_callback:{stage:"contact",say:"Perfect, I'll try them then. Appreciate your help.",resp:[{l:"End gatekeeper call",n:"end"}]},
+  gk_pushback:{stage:"contact",say:"Totally fine. Just before I leave it, is that because you're already sorted for job tracking, or because [Name] is not the right person for that?",resp:[
+    {l:"Already sorted",n:"gk_email"},
+    {l:"Not the right person",n:"gk_find"},
+    {l:"They soften / can transfer",n:"opener_transfer",tone:"good"}
+  ]},
+
+  opener_transfer:{stage:"opener",say:"Hey [Name], it's James from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?",note:"They've been transferred - keep it clean. If they say go ahead, straight into Factory positioning.",resp:[
+    {l:"Go ahead / not a bad time",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]},
+    {l:"Bad time / rushed",n:"rushed"},
+    {l:"They know Factory / seen us before",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]}
+  ]},
+  opener:{stage:"opener",say:"Hey [Name], it's James from Factory. Sorry for the out-of-the-blue call - have I caught you at a bad time?",note:"Wait. If yes: say no worries and end. If no, go straight into positioning. Do not ask permission twice.",resp:[
+    {l:"Go ahead / not a bad time",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]},
+    {l:"Bad time / rushed",n:"rushed"},
+    {l:"They know Factory / seen us before",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]}
+  ]},
+  rushed:{stage:"opener",say:"No worries, I'll be brief. We help fabrication shops tighten up quoting, job tracking and paperwork where things are still manual. How are you managing that at the moment?",resp:[
+    {l:"They describe a messy manual setup",n:"process_map",tone:"pain",score:["open_position","pain_manage_now"],cap:{current_process:"Manual / messy process"}},
+    {l:"Short or vague answer",n:"process_map",score:["open_position","pain_manage_now"]},
+    {l:"Still too busy",n:null,tone:"obj",obj:"busy"},
+    {l:"Send me something",n:null,tone:"obj",obj:"sendit"}
+  ]},
+  opener_context:{stage:"opener",say:"Nice one. We work with fabrication shops that are still managing quoting and jobs through spreadsheets, paper job cards or a few disconnected systems. How are you handling all that at the moment?",score:["open_position"],resp:[
+    {l:"They describe a messy manual setup",n:"process_map",tone:"pain",score:["pain_manage_now"],cap:{current_process:"Manual / messy process"}},
+    {l:"Short or vague answer",n:"process_map",score:["pain_manage_now"]},
+    {l:"Sounds organised / no obvious pain",n:"no_pain_soft"},
+    {l:"Have a system",n:null,tone:"obj",obj:"system"},
+    {l:"Have an ERP / MRP",n:null,tone:"obj",obj:"erp"},
+    {l:"Happy as we are",n:null,tone:"obj",obj:"happy"},
+    {l:"Send me something",n:null,tone:"obj",obj:"sendit"}
+  ]},
+
+  process_map:{stage:"discovery",say:"Got it. Talk me through it from when a job comes in to when it gets finished and invoiced. What happens first?",note:"Let them describe the full flow before you respond. Then pick what best describes what you heard — these are your categories, not their words.",resp:[
+    {l:"Lots of manual steps — spreadsheets, paper, re-keying",n:"pain_select",tone:"pain",score:["pain_process"],cap:{current_process:"Manual steps throughout — spreadsheets, paper, re-keying"}},
+    {l:"Stitched together — a few disconnected tools",n:"pain_select",tone:"pain",score:["pain_process"],cap:{current_process:"Stitched-together disconnected tools"}},
+    {l:"Everything depends on one person knowing the answer",n:"pain_select",tone:"pain",score:["pain_process"],cap:{current_process:"One-person dependency"}},
+    {l:"Sounds organised — nothing obvious yet",n:"no_pain_soft",score:["pain_process"]}
+  ]},
+  pain_select:{stage:"discovery",say:"Out of that whole flow, what feels most manual or time-consuming day to day?",note:"Let them choose the area. Then go deep on that specific lane. Do not rush to the next question.",resp:[
+    {l:"Quoting / pricing / margins",n:"impact_margin",tone:"pain",score:["pain_named","pain_deep"],cap:{primary_pain:"Quoting and margin"}},
+    {l:"Job tracking / customer updates / visibility",n:"impact_visibility",tone:"pain",score:["pain_named","pain_deep"],cap:{primary_pain:"Job visibility and updates"}},
+    {l:"Paperwork / invoicing / admin handoff",n:"impact_admin",tone:"pain",score:["pain_named","pain_deep"],cap:{primary_pain:"Admin and invoicing handoff"}},
+    {l:"Old system / bits still outside it",n:"impact_clunky",tone:"pain",score:["pain_named","pain_deep"],cap:{primary_pain:"Clunky system with gaps"}},
+    {l:"Honestly, it mostly works",n:"no_pain_soft"}
+  ]},
+  impact_margin:{stage:"discovery",say:"On the quoting and margin side, what's the real effect - margin getting squeezed, finding out too late, or labour running over quote?",note:"Do not suggest the pain is bigger than they say. Get the specific consequence.",resp:[
+    {l:"Margin gets squeezed / guesswork",n:"frequency",tone:"pain",cap:{impact:"Margin uncertainty"}},
+    {l:"Find out too late to act",n:"frequency",tone:"pain",cap:{impact:"Margin issues found too late"}},
+    {l:"Labour or materials run over quote",n:"frequency",tone:"pain",cap:{impact:"Labour / materials overrun quote"}},
+    {l:"Scope changes or extras get missed",n:"frequency",tone:"pain",cap:{impact:"Scope changes not captured"}}
+  ]},
+  impact_visibility:{stage:"discovery",say:"When a customer asks for an update, what's the real effect - daily chasing, having to walk the floor, or only one person knowing where jobs are?",resp:[
+    {l:"Daily customer update chasing",n:"frequency",tone:"pain",cap:{impact:"Daily chasing for job updates"}},
+    {l:"Have to walk the floor to check",n:"frequency",tone:"pain",cap:{impact:"Walk the floor for every update"}},
+    {l:"Only one person knows where jobs are",n:"frequency",tone:"pain",cap:{impact:"One person holds all job status"}}
+  ]},
+  impact_admin:{stage:"discovery",say:"Where does the handover create the real problem - admin chasing info, paper getting passed around, or invoices waiting on paperwork coming back?",resp:[
+    {l:"Admin has to chase job information",n:"frequency",tone:"pain",cap:{impact:"Admin chasing job information"}},
+    {l:"Paper / notes get passed around",n:"frequency",tone:"pain",cap:{impact:"Paper handoff between jobs and office"}},
+    {l:"Invoices wait for paperwork to come back",n:"frequency",tone:"pain",cap:{impact:"Invoices delayed by paperwork"}}
+  ]},
+  impact_clunky:{stage:"discovery",say:"When you say the current setup is clunky or has gaps, what's the real effect - hard to use, important bits still sitting outside it, or no live visibility on the floor?",resp:[
+    {l:"Hard to use / not intuitive",n:"frequency",tone:"pain",cap:{impact:"System is clunky and hard to use"}},
+    {l:"Planning / scheduling sits outside it",n:"frequency",tone:"pain",cap:{impact:"Planning and scheduling still outside system"}},
+    {l:"No live progress or job visibility",n:"frequency",tone:"pain",cap:{impact:"No live job or floor visibility"}},
+    {l:"It covers most things pretty well",n:"no_pain_soft"}
+  ]},
+  frequency:{stage:"discovery",say:"How often does that crop up in a normal week?",note:"Even a ballpark is useful. This starts turning pain into a commercial conversation.",resp:[
+    {l:"Daily / constantly",n:"who_feels_it",tone:"pain",score:["pain_quant"],cap:{frequency:"Daily / constant"}},
+    {l:"A few times a week",n:"who_feels_it",tone:"pain",score:["pain_quant"],cap:{frequency:"A few times a week"}},
+    {l:"Occasional but costly when it happens",n:"who_feels_it",tone:"pain",score:["pain_quant"],cap:{frequency:"Occasional but high impact"}}
+  ]},
+  who_feels_it:{stage:"discovery",say:"And who ends up wearing that the most - you, admin, the guys on the floor, or the customer?",note:"Capture this before urgency. It makes the transition and demo more specific.",resp:[
+    {l:"Mainly me / the owner",n:"urgency",tone:"pain",cap:{who_feels_it:"Owner"}},
+    {l:"Admin / office",n:"urgency",tone:"pain",cap:{who_feels_it:"Admin / office"}},
+    {l:"Whole team / floor",n:"urgency",tone:"pain",cap:{who_feels_it:"Whole team"}},
+    {l:"Customer feels it too",n:"urgency",tone:"pain",cap:{who_feels_it:"Customer"}}
+  ]},
+  urgency:{stage:"discovery",say:"How live is this for you at the moment - actively trying to tighten it up now, something that needs sorting before growth ramps, or more one to keep in mind for later?",note:"This separates a real project from general interest without making the call feel like an interrogation.",resp:[
+    {l:"Actively reviewing / improving now",n:"qual_accounts",tone:"good",score:["pain_manage_now"],cap:{priority_timing:"Active now"}},
+    {l:"Needs sorting before growth ramps",n:"qual_accounts",tone:"good",cap:{priority_timing:"Before growth ramps"}},
+    {l:"Interested but not urgent",n:"qual_accounts",cap:{priority_timing:"Interested / not urgent"}},
+    {l:"Not a priority right now",n:"no_pain_wrap",cap:{priority_timing:"Not a priority"}}
+  ]},
+  no_pain_soft:{stage:"discovery",say:"Fair enough. Is there any part you'd still improve if it was simple to change, or is it genuinely where you want it for now?",note:"Gives them a graceful way to surface pain without feeling challenged. If they stay happy, wrap it cleanly.",resp:[
+    {l:"There is one manual bit",n:"pain_select",tone:"pain"},
+    {l:"We're always looking at upgrading quoting",n:"pain_select",tone:"pain",cap:{current_process:"Looking to upgrade quoting"}},
+    {l:"Happy for now",n:"probe_growth"},
+    {l:"Maybe later / not a priority",n:"probe_growth"}
+  ]},
+  probe_growth:{stage:"discovery",say:"Fair enough. If you were to grow the business this year - would your current setup handle the extra load easily, or would it start to feel a bit old school?",resp:[
+    {l:"It would struggle / start to crack",n:"growth_impact",tone:"pain"},
+    {l:"Things are fluid / under review",n:"squeeze_fluid",tone:"pain",cap:{priority_timing:"Business in transition"}},
+    {l:"Yeah it would be fine",n:"no_pain_wrap"},
+    {l:"Not planning to grow much",n:"no_pain_wrap"}
+  ]},
+  squeeze_fluid:{stage:"discovery",say:"When you say things are fluid or under review - does that mean you're actively looking at improving how ops work, or is it more that roles and structure are changing?",note:"This is a serious buying signal. Treat it as urgent.",resp:[
+    {l:"Actively looking at improving ops / systems",n:"urgency",tone:"pain",cap:{priority_timing:"Actively reviewing systems"}},
+    {l:"Roles / structure changing",n:"urgency",tone:"pain",cap:{priority_timing:"Business in transition"}},
+    {l:"Just general change, nothing specific",n:"urgency"}
+  ]},
+  growth_impact:{stage:"discovery",say:"What do you think would start to crack first if more work came in - quoting, keeping track of jobs, customer updates, paperwork, or invoicing?",note:"This is future pain, not current frequency. Get the specific failure point.",resp:[
+    {l:"Quoting / admin would get swamped",n:"frequency",tone:"pain",cap:{primary_pain:"Quoting and admin load",impact:"Would not scale with growth"}},
+    {l:"Keeping track of jobs / updates",n:"frequency",tone:"pain",cap:{primary_pain:"Job visibility",impact:"Would not scale with growth"}},
+    {l:"Everything would sit with one person",n:"frequency",tone:"pain",cap:{primary_pain:"Owner bottleneck",impact:"Would not scale with growth"}},
+    {l:"Not sure, just feels like pressure",n:"urgency",tone:"pain",cap:{primary_pain:"Growth pressure on current process"}}
+  ]},
+  no_pain_wrap:{stage:"wrap",say:"Fair enough. Sounds like right now the current setup is doing the job and there probably isn't a burning reason to change. Rather than force a demo that isn't relevant, I'll leave you with my details. If the manual side starts to bite later, it's worth a chat.",note:"Do not qualify just for the sake of it. Wrap it cleanly.",resp:[
+    {l:"End call cleanly",n:"end"},
+    {l:"They mention a pain after all",n:"pain_select",tone:"pain"},
+    {l:"They ask for info",n:null,tone:"obj",obj:"sendit"}
+  ]},
+
+  qual_accounts:{stage:"qualify",say:"That's really helpful - quick practical question: what accounting software are you using - Xero, QuickBooks, Sage, anything like that?",note:"Accounts first - catches the Sage blocker and ERP risk early. Move to stack, then headcount.",resp:[
+    {l:"Xero / QuickBooks / MYOB",n:"qual_stack",tone:"good",score:["qual_tools"],cap:{accounting:"Supported accounting package"}},
+    {l:"Sage",n:"qual_sage",cap:{accounting:"Sage"}},
+    {l:"Full ERP / integrated system",n:"qual_erp",score:["qual_tools"],cap:{accounting:"ERP / integrated system"}},
+    {l:"Nothing / spreadsheets only",n:"qual_stack",tone:"good",score:["qual_tools"],cap:{accounting:"None / spreadsheets only"}}
+  ]},
+  qual_sage:{stage:"qualify",say:"Just so I'm upfront - we integrate with Xero, QuickBooks and MYOB, but Sage isn't on the list yet. The reason that matters is the accounting integration is one of the biggest parts of the platform - no double entry, invoices sync straight across. Without it you'd still have to run both in parallel. Is Sage something you're locked into long term, or could that change?",resp:[
+    {l:"Locked into Sage - sync is essential",n:"sage_out"},
+    {l:"Not locked in / could switch",n:"qual_stack",tone:"good",cap:{accounting:"Sage - open to switching"}},
+    {l:"Still worth seeing despite the Sage step",n:"qual_stack",tone:"good",cap:{accounting:"Sage - still interested"}}
+  ]},
+  qual_erp:{stage:"qualify",say:"Got it - if it's covering the workflow properly end to end, I don't want to force a conversation that isn't relevant. Are there still important bits happening outside it - live job tracking, paperwork flow, timesheets, or visibility on margin?",resp:[
+    {l:"Yes, there are still gaps outside it",n:"qual_stack",tone:"good",score:["qual_tools"]},
+    {l:"No, covers everything and they're happy",n:"qualify_out"}
+  ]},
+  qual_stack:{stage:"qualify",say:"And what else are you using to manage the job side of things - quoting, job tracking, timesheets? Mostly spreadsheets and paper, or have you got other tools in the mix?",resp:[
+    {l:"Mostly spreadsheets / manual / paper",n:"qual_headcount",tone:"pain",cap:{current_process:"Manual stack across the board"}},
+    {l:"Mix of tools stitched together",n:"qual_headcount",tone:"pain",cap:{current_process:"Stitched-together tools"}},
+    {l:"Proper system for most of it",n:"qual_headcount"}
+  ]},
+  qual_headcount:{stage:"qualify",say:"And how many staff have you got across the workshop and wider business?",resp:[
+    {l:"Under 5",n:"qual_under5",score:["qual_fit"],cap:{headcount:"Under 5"}},
+    {l:"5 to 50 - sweet spot",n:"qual_worktype",tone:"good",score:["qual_fit"],cap:{headcount:"5-50"}},
+    {l:"Bigger / complex",n:"qual_big",cap:{headcount:"50+"}}
+  ]},
+  qual_under5:{stage:"qualify",say:"Yeah no worries, we do work with really small teams. At that size does most of the admin land on one person or is it pretty manageable as is?",resp:[
+    {l:"One person doing everything - still pain",n:"qual_worktype",tone:"good"},
+    {l:"Pretty manageable honestly",n:"qualify_out"}
+  ]},
+  qual_big:{stage:"qualify",say:"Are you running a full system that covers the whole workflow, or is it more stitched together between a few different tools?",resp:[
+    {l:"Full system, happy with it",n:"qualify_out"},
+    {l:"Stitched together / gaps still there",n:"qual_worktype",tone:"good"}
+  ]},
+  qual_worktype:{stage:"qualify",say:"Just so I understand the fit - are you mainly fabrication with some install, or is installation a major part of the business?",note:"Trigger this when they mention site work, install crews, or fitting.",resp:[
+    {l:"Mainly fabrication / workshop",n:"qual_dm",tone:"good",score:["qual_fit"],cap:{worktype:"Fabrication primary"}},
+    {l:"Mix of fabrication and install",n:"qual_dm",tone:"good",score:["qual_fit"],cap:{worktype:"Mix of fab and install"}},
+    {l:"Mostly install / site-led",n:"qual_install_heavy",cap:{worktype:"Install heavy"}}
+  ]},
+  qual_install_heavy:{stage:"qualify",say:"Got it - just so I'm not wasting your time, we're built around the fabrication and production side of the business. If it's mostly install-led, we'd probably not be the right fit. Is fabrication still a significant part of what you do day to day?",resp:[
+    {l:"Yes, fabrication is still core",n:"qual_dm",tone:"good",cap:{worktype:"Install heavy but fab still core"}},
+    {l:"Honestly mostly install / site",n:"qualify_out"}
+  ]},
+  qual_dm:{stage:"qualify",say:"Are you the person who'd normally make a call on something like this, or is there someone else who'd need to be involved?",note:"If they name someone else, get that person on the demo invite now, not later.",resp:[
+    {l:"Yes - it's my call",n:"qual_stakeholders",tone:"good",score:["qual_dm"],cap:{dm_status:"Decision-maker on call"}},
+    {l:"Someone else needs to be involved",n:"qual_dm_other",cap:{dm_status:"Influencer only - DM identified"}},
+    {l:"Joint decision with partner / owner",n:"qual_dm_other",cap:{dm_status:"Joint decision"}}
+  ]},
+  qual_dm_other:{stage:"qualify",say:"Got it - rather than you having to relay it all second-hand, let's make sure they're on the call too. Who is it, and are they usually around mornings or afternoons?",note:"Get their name and email now. Copy them into the invite on the call.",resp:[
+    {l:"Can get them on - have their details",n:"qual_stakeholders",tone:"good"},
+    {l:"They'd want to review first",n:"qual_stakeholders"},
+    {l:"Not sure if they'd join",n:"qual_stakeholders"}
+  ]},
+  qual_stakeholders:{stage:"qualify",say:"Who else should be involved in the demo so we cover this properly - just yourself, or someone from admin, operations or ownership as well?",note:"This stops the demo becoming second-hand. If someone else cares about the decision, get them invited now.",resp:[
+    {l:"Just me",n:"transition",tone:"good",score:["qual_dm"],cap:{stakeholders:"Just this person"}},
+    {l:"Owner / partner / admin should join",n:"transition",tone:"good",score:["qual_dm"],cap:{stakeholders:"Additional stakeholder to invite"}},
+    {l:"Need to check who should join",n:"transition",cap:{stakeholders:"Needs stakeholder confirmation"}}
+  ]},
+  qualify_out:{stage:"wrap",say:"Look, I'd rather be straight with you than book a demo that isn't going to be relevant. Based on what you've said, I don't think we'd be a great fit right now - but if that changes or you start scaling, it's worth a chat. I'll drop you a quick email so you've got my details.",resp:[{l:"End call cleanly",n:"end"}]},
+  sage_out:{stage:"wrap",say:"Completely fair. If Sage sync is essential and you don't want any manual accounting step at all, I'd rather call that out now than waste your time. I'll keep you on the list for Sage integration and come back once that changes.",resp:[{l:"Fair enough - end call",n:"end"}]},
+
+  transition:{stage:"close",say:"Let me just check I've got this right - [pain], and that's creating [impact]. Based on that, I'd like to show you how other fabrication shops are tightening up those exact areas with Factory. We'd keep it focused on that - if you don't see value, fair enough. Does it feel worth a proper look?",note:"Recap pain AND impact. Then get the micro-commitment before you touch the calendar.",resp:[
+    {l:"Yes - worth a look",n:"book_window",tone:"good",score:["sol_pain","sol_social","sol_demo","book_value"]},
+    {l:"Maybe / not sure",n:null,tone:"obj",obj:"think"},
+    {l:"Send me something first",n:null,tone:"obj",obj:"sendit"},
+    {l:"No budget",n:null,tone:"obj",obj:"budget"}
+  ]},
+  book_window:{stage:"close",say:"Good. Let's get something in the diary now and keep it focused on that. Is next week generally better for you, or the week after?",note:"Narrow from week first. Do not jump to a specific time.",resp:[
+    {l:"Next week",n:"book_day",tone:"good",score:["book_push"]},
+    {l:"Week after",n:"book_day",tone:"good",score:["book_push"]},
+    {l:"Too busy / not sure",n:null,tone:"obj",obj:"busy"}
+  ]},
+  book_day:{stage:"close",say:"Fine - would Tuesday or Thursday suit better?",resp:[
+    {l:"Tuesday",n:"book_time",tone:"good",cap:{booked_day:"Tuesday"}},
+    {l:"Thursday",n:"book_time",tone:"good",cap:{booked_day:"Thursday"}},
+    {l:"They give another day",n:"book_time",tone:"good",cap:{booked_day:"Other day chosen"},score:["book_times"]}
+  ]},
+  book_time:{stage:"close",say:"I can do 10 or 2 - which works better for you?",resp:[
+    {l:"10:00",n:"book_confirm",tone:"good",score:["book_times"],cap:{booked_time:"10:00"}},
+    {l:"2:00",n:"book_confirm",tone:"good",score:["book_times"],cap:{booked_time:"2:00"}},
+    {l:"They propose another time",n:"book_confirm",tone:"good",score:["book_times"],cap:{booked_time:"Alternate time agreed"}}
+  ]},
+  book_confirm:{stage:"close",say:"Perfect. I'll send the Zoom invite now while we're on the phone. We'll focus on [pain] so it's not just a generic demo. And if there's anyone else who should be on the call, let's get them on now.",note:"Send the invite live. Confirm email on the call. Copy all decision-makers.",resp:[
+    {l:"Invite sent and all emails confirmed",n:"book_context",tone:"good",score:["book_dm","book_recap"],cap:{invite_status:"Invite sent live"}},
+    {l:"Invite pending / need to send after",n:"book_context",cap:{invite_status:"Not sent live"}},
+    {l:"Need to add another stakeholder",n:"book_context",tone:"good",score:["book_dm","book_recap"],cap:{stakeholders:"Additional stakeholder added"}}
+  ]},
+  book_context:{stage:"close",say:"Great - on that call we'll first go a bit deeper on how you're handling jobs now, then I'll show you how similar shops are tightening up [pain]. If it's not relevant, no problem. Before then, if you've got a blank quote, job sheet or sales order, send it across and I'll make it more relevant to your setup.",note:"This sets context, makes the demo feel purposeful, and reduces no-shows.",resp:[
+    {l:"Context set - end call",n:"end",tone:"good"}
+  ]},
+  end:{stage:"done",say:"Perfect. Appreciate your time [Name], speak soon.",resp:[]}
+};
+
+// ── OBJECTIONS ───────────────────────────────────────────────────────────────
+var OBJS = {
+  happy:{t:"Happy as we are",a:"Yeah totally, that's fair - most shops I speak to already have something in place.",i:"Usually the question isn't whether things are working - it's whether there are still bits happening in spreadsheets, paper, or someone's head. Is there anything important still sitting outside whatever you've got?",m:"What's the most manual bit day to day - quoting, tracking where jobs are, paperwork, or getting invoices out?",f:"If you were to grow the business this year - would your current setup handle the extra load easily, or would it start to feel a bit old school?",rs:"process_map"},
+  busy:{t:"Too busy / call me later",a:"Yeah completely get it, no problem at all.",i:"Usually when I hear that it's either just bad timing today, or this just isn't a priority right now. Which is it - so I'm not chasing you for no reason?",m:"If it's timing, let's pin something in now so it doesn't disappear - which works better, Thursday this week or early next week? I'll keep it to 15 minutes.",f:"That's actually exactly why I'm calling - most of the shops we work with are flat out because too much is still sitting on manual admin. Is that part of the problem for you?",rs:null},
+  budget:{t:"No budget / too expensive",a:"Yeah that's fair, budget's always a factor.",i:"Honestly it's usually less about the cost itself and more about whether changing would actually be worth it. If I take money off the table for a second - are there areas where you know you're losing time or leaving margin on the table?",m:"If there are, it's probably worth 15 minutes just to see if the savings stack up. I'm not asking you to sign anything today - just to have a look. Would that be unreasonable?",f:"The way I look at it - if the admin side is costing a few hours a week, that's already more expensive than the software.",rs:"transition"},
+  small:{t:"We're too small",a:"Yeah I hear that a lot to be honest.",i:"We work with really small teams - like two or three guys. The thing is, smaller shops are usually the ones feeling it the most because the same one or two people are doing everything.",m:"Is that the case for you, or have you genuinely got it running cleanly?",f:"How many people are actually touching the jobs from quote through to invoice at the moment?",rs:"qual_headcount"},
+  system:{t:"Already have a system",a:"Yeah totally, a lot of shops we speak to already have something.",i:"Usually the question isn't whether you have a system - it's whether it genuinely covers everything end to end. Are there still important bits sitting in spreadsheets, paper, or someone's head outside it?",m:"What are you still having to do outside the system at the moment?",f:"What's the bit your current setup doesn't handle as well as you'd like - even if everything else is fine?",rs:"process_map"},
+  erp:{t:"Already have an ERP / MRP",a:"Got it - if it's covering the whole workflow properly end to end, I don't want to force a conversation that isn't relevant.",i:"Is it genuinely covering everything - live job tracking, paperwork flow, timesheets, real-time margin visibility - or are there still bits sitting in spreadsheets, paper, or someone's head?",m:"Usually when shops have a system but still feel the pain, it's not that the system doesn't exist - it's that the gaps are still there. What's still happening outside it?",f:"What would you say is the bit your current system handles least well day to day?",rs:"process_map"},
+  notme:{t:"Not the right person",a:"No problem at all.",i:"Who normally looks after that side of things - who'd be the person making a call on systems?",m:"Would it make sense for me to give them a call, or is there a better way to get in front of them?",f:"Rather than you having to relay it all second-hand - could we get them on a quick call together? Even just 15 minutes.",rs:null},
+  nopain:{t:"Everything's fine",a:"Yeah fair enough, I'm not trying to force anything.",i:"I'm just trying to work out whether there's any area where the manual side creates a headache - even a small one. Is there anything you'd change if it wasn't a hassle to change it?",m:"If you were to grow the business this year - hand on heart, would your current process handle twice the volume easily, or would something start to crack?",f:"What's the most manual bit still - even if everything else is running well?",rs:"no_pain_soft"},
+  think:{t:"Need to think about it",a:"Yeah completely, I don't want you to rush into anything.",i:"Usually when someone says that, there's one thing they're not fully sold on yet. Is it more that you're not sure it would actually solve the problem, or is it more that you're cautious about making a change?",m:"After what we've covered - does it feel like it would actually help? If yes, what's genuinely holding you back - is it the price, timing, or just nerves about the change?",f:"What would need to happen between now and us speaking again for you to feel comfortable making a call on it?",rs:"book_window"},
+  trial:{t:"Want a trial first",a:"Yeah totally get it - you want to see it properly before committing, that makes sense.",i:"When you say a trial - are you worried it doesn't do something specific you need, or is it more just that you want a bit more comfort that it'll work for your setup?",m:"What if you sent me over a sample job or sales order - I'll mock it up in Factory using your actual layout, and we can walk through it together. Does that work?",f:"What specifically would you be testing, and what would need to happen for you to feel confident it's the right fit?",rs:"transition"},
+  rollout:{t:"Too much effort to roll out",a:"Yeah that's a fair concern - any change like this takes some effort upfront.",i:"The question is really whether the effort is worth the outcome. If it sorts out the problem, is a few weeks of setup time worth it to you?",m:"The way our onboarding works is we do most of the heavy lifting - you guide us on how your jobs run, we set it up. Most shops are up and running within a few weeks.",f:"What would make you feel confident that we'd handle the implementation properly?",rs:"transition"},
+  change:{t:"Team won't use it",a:"Yeah, getting a team to change how they do things is always the hardest part.",i:"Is the worry that the system itself is too complicated, or more that the guys on the floor just won't bother with it?",m:"The guys on the floor are updating a job status on a screen or tablet. Designed to be as simple as possible for the people most resistant to it.",f:"What level of simplicity would the team need for it to actually get used day-to-day?",rs:"transition"}
+};
+
+// ── PAIN EXTRACTION PROBE BANKS ───────────────────────────────────────────────
+var PROBE_BANKS = {
+  spotted:{
+    label:"I can see friction in what they described",
+    note:"They walked through their process and it sounds fine to them. Use these to slow them down and make them look at a specific moment properly.",
+    questions:[
+      "When [the thing they described] happens — walk me through exactly what that looks like. Who's doing what?",
+      "How long does that actually take each time?",
+      "Is that mainly landing on you, or does it fall on someone else?",
+      "When you've got a lot on at once — does that hold up or does it start to crack?"
+    ]
+  },
+  small:{
+    label:"They admitted something small",
+    note:"They conceded something but downplayed it — 'sometimes', 'a bit hectic', 'once or twice a month'. Use these to make the small thing bigger.",
+    questions:[
+      "When that happens, what does it actually cost you — time, a delayed invoice, a mistake, or just your own time personally?",
+      "Who ends up wearing that when it hits — you, someone in the office, or the floor?",
+      "How long does it take to get back on track after that?",
+      "If you got 30% busier — does that start happening more, or does it stay manageable?"
+    ]
+  },
+  brushed:{
+    label:"They brushed it off or defended it",
+    note:"They filed the friction under acceptable — 'that's just business', 'we manage', 'it's the way we've always done it'. Use these to reframe it as a setup problem, not a work problem.",
+    questions:[
+      "I'm not saying it's broken right now — I'm asking what happens when more work comes in. Does the setup scale, or do you end up scaling people?",
+      "Is that a volume problem or a setup problem? Because volume is great — it's when the setup can't keep up with the volume that it gets expensive.",
+      "What would it mean if you could take on 30% more work without it falling back on you personally?",
+      "If you hired someone tomorrow to help — would the problem go away, or would it just move to them?"
+    ]
+  }
+};
+
+
+var SCORE_CATS = [
+  {t:"Opening and Rapport",max:4,items:[{id:"open_energy",l:"Energy and confidence"},{id:"open_courtesy",l:"Pattern interrupt / courtesy"},{id:"open_position",l:"Quick Factory positioning"},{id:"open_permission",l:"Permission to proceed"}]},
+  {t:"Pain Discovery",max:5,items:[{id:"pain_named",l:"Named a real fabricator pain"},{id:"pain_manage_now",l:"Asked how they manage it now"},{id:"pain_process",l:"Got process end-to-end"},{id:"pain_quant",l:"Extracted time / money / volume"},{id:"pain_deep",l:"Used a deeper follow-up probe"}]},
+  {t:"Qualification",max:3,items:[{id:"qual_fit",l:"Confirmed type, size and fit"},{id:"qual_tools",l:"Asked current tools / accounting"},{id:"qual_dm",l:"Confirmed DM / stakeholders"}]},
+  {t:"Solution and Transition",max:3,items:[{id:"sol_pain",l:"Framed Factory to their pain"},{id:"sol_social",l:"Used social proof"},{id:"sol_demo",l:"Cleanly suggested a demo"}]},
+  {t:"Booking and Next Steps",max:5,items:[{id:"book_value",l:"Gained agreement demo has value"},{id:"book_dm",l:"Checked decision-makers included"},{id:"book_times",l:"Proposed specific times"},{id:"book_push",l:"Held timing control"},{id:"book_recap",l:"Recapped and confirmed live"}]},
+  {t:"Objection Handling",max:5,items:[{id:"obj_ack",l:"Acknowledged the concern"},{id:"obj_isolate",l:"Isolated the root objection"},{id:"obj_aim",l:"Applied AIM framework"},{id:"obj_roi",l:"Restated pain vs status quo"},{id:"obj_closed",l:"Moved to a closed outcome"}]}
+];
+
+var QUAL_FIELDS = [
+  {key:"primary_pain",label:"Primary pain"},
+  {key:"current_process",label:"Current process"},
+  {key:"impact",label:"Impact"},
+  {key:"frequency",label:"Frequency"},
+  {key:"who_feels_it",label:"Who feels it"},
+  {key:"priority_timing",label:"Priority / timing"},
+  {key:"accounting",label:"Accounting"},
+  {key:"headcount",label:"Headcount"},
+  {key:"worktype",label:"Fab vs install"},
+  {key:"dm_status",label:"DM status"},
+  {key:"stakeholders",label:"Stakeholders"},
+  {key:"invite_status",label:"Invite status"}
+];
+
+var MUST_QUAL = ["primary_pain","impact","priority_timing","accounting","headcount","worktype","dm_status"];
+var PROGRESS  = [
+  {key:"contact",label:"Contact"},
+  {key:"process",label:"Process"},
+  {key:"pain",label:"Pain"},
+  {key:"impact",label:"Impact"},
+  {key:"fit",label:"Fit"},
+  {key:"meeting",label:"Meeting"}
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var state;
+function freshState(){
+  return {
+    current:"start", history:[], manualNotes:"", drawer:null,
+    scoreManual:{}, scoreAuto:{},
+    captures:{
+      primary_pain:"",current_process:"",impact:"",frequency:"",
+      who_feels_it:"",priority_timing:"",accounting:"",headcount:"",
+      worktype:"",dm_status:"",stakeholders:"",booked_day:"",
+      booked_time:"",invite_status:"",next_step:""
+    },
+    probe:null
+  };
+}
+function resetCall(){state=freshState();var n=document.getElementById("call-notes");if(n)n.value="";renderAll()}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+
+// ── GATE / BOOKING LOGIC ──────────────────────────────────────────────────────
+function hasProcess(){return !!state.captures.current_process}
+function hasPain(){return !!state.captures.primary_pain}
+function hasImpact(){return !!state.captures.impact}
+function hasPriority(){return !!state.captures.priority_timing}
+function hasFit(){return !!state.captures.accounting&&!!state.captures.headcount&&!!state.captures.worktype&&!!state.captures.dm_status}
+function meetingBooked(){return !!state.captures.booked_day&&!!state.captures.booked_time}
+function discoveryGate(){return (hasProcess()?1:0)+(hasPain()?1:0)+(hasImpact()?1:0)+(hasPriority()?1:0)}
+function missingBookGate(){return MUST_QUAL.filter(function(k){return !state.captures[k]})}
+function qualCount(){return MUST_QUAL.length - missingBookGate().length}
+function canBook(sid){
+  var bsteps=["transition","book_window","book_day","book_time","book_confirm","book_context"];
+  return bsteps.indexOf(sid)===-1||(discoveryGate()===4&&missingBookGate().length===0);
+}
+
+// ── TEXT HELPERS ───────────────────────────────────────────────────────────────
+function getPain(){return state.captures.primary_pain||"the manual process issues you mentioned"}
+function getImpact(){return state.captures.impact||"friction in the current process"}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function personalizeText(txt){
+  return esc(txt)
+    .replace(/\[pain\]/gi,'<span class="auto-pain">'+esc(getPain())+'</span>')
+    .replace(/\[impact\]/gi,'<span class="auto-pain">'+esc(getImpact())+'</span>');
+}
+
+// ── SCORING ────────────────────────────────────────────────────────────────────
+function scoreMet(id){return !!(state.scoreManual[id]||state.scoreAuto[id])}
+function toggleScore(id){state.scoreManual[id]=!state.scoreManual[id];renderScoreCard()}
+function markScores(ids){(ids||[]).forEach(function(id){state.scoreAuto[id]=true})}
+function scoreTotal(){var t=0;SCORE_CATS.forEach(function(c){c.items.forEach(function(i){if(scoreMet(i.id))t++})});return t}
+function scoreBand(n){if(n>=20)return"World-class";if(n>=15)return"Good";if(n>=10)return"Basic";if(n>=5)return"Poor";return"Major misses"}
+
+// ── INTERACTION ────────────────────────────────────────────────────────────────
+function chooseResp(sid,idx){
+  var step=FLOW[sid];if(!step)return;
+  var r=step.resp[idx];if(!r)return;
+  state.history.push(clone(state));
+  state.drawer=null;
+  if(r.cap){Object.keys(r.cap).forEach(function(k){state.captures[k]=r.cap[k]})}
+  if(r.score)markScores(r.score);
+  if(step.score)markScores(step.score);
+  if(r.obj){openObj(r.obj);renderAll();return}
+  if(r.n)state.current=r.n;
+  renderAll();
+}
+function openObj(key){state.drawer={key:key};state.probe=null}
+function handleObjContinue(target){
+  state.history.push(clone(state));
+  state.drawer=null;
+  markScores(["obj_ack","obj_isolate","obj_aim","obj_closed"]);
+  if(hasPain())markScores(["obj_roi"]);
+  state.current=target;
+  renderAll();
+}
+function closeDrawer(){state.drawer=null;document.getElementById("odrawer").classList.add("hidden")}
+
+function openProbe(){state.probe={cat:null};state.drawer=null;renderProbePanel();document.getElementById("probe-panel").classList.remove("hidden");document.getElementById("probe-panel").scrollIntoView({behavior:"smooth",block:"nearest"})}
+function closeProbe(){state.probe=null;document.getElementById("probe-panel").classList.add("hidden")}
+function selectProbeCat(key){state.probe={cat:key};renderProbePanel()}
+function handleProbeAdmission(){
+  markScores(["pain_named","pain_deep","pain_quant"]);
+  state.probe=null;
+  document.getElementById("probe-panel").classList.add("hidden");
+  state.current="pain_select";
+  renderAll();
+}
+function goBack(){if(!state.history.length)return;state=state.history.pop();state.probe=null;renderAll()}
+function saveNotes(){var el=document.getElementById("call-notes");state.manualNotes=el?el.value:"";renderMiniSummary()}
+
+// ── RENDER: DISCOVERY GATE BAR ────────────────────────────────────────────────
+function renderGateBar(){
+  var g=discoveryGate();
+  var fill=document.getElementById("gate-fill");
+  var lbl=document.getElementById("gate-lbl");
+  var st=document.getElementById("gate-st");
+  var items=document.getElementById("gate-items");
+  if(fill)fill.style.width=(g/4*100)+"%";
+  if(fill)fill.style.background=g===4?"var(--green)":g>=2?"var(--amber)":"var(--text3)";
+  if(lbl){lbl.textContent="Discovery gate: "+g+" / 4";lbl.style.color=g===4?"var(--green)":g>0?"var(--amber)":"var(--text3)"}
+  if(st)st.textContent=g===4?"Discovery complete - qualify then book":"Capture process, pain, impact and priority before booking";
+  if(items){
+    var gateLabels=[["Process",hasProcess()],["Pain",hasPain()],["Impact",hasImpact()],["Priority",hasPriority()]];
+    var h="";
+    gateLabels.forEach(function(it){h+='<span class="gate-item '+(it[1]?"done":"")+'">'+it[0]+'</span>'});
+    items.innerHTML=h;
+  }
+}
+
+// ── RENDER: PROGRESS STRIP ────────────────────────────────────────────────────
+function renderProgress(){
+  var stage=(FLOW[state.current]&&FLOW[state.current].stage)||"contact";
+  var checks={contact:state.current!=="start",process:hasProcess(),pain:hasPain(),impact:hasImpact(),fit:hasFit(),meeting:meetingBooked()};
+  // Map stage to active progress key
+  var active="contact";
+  if(stage==="opener")active="contact";
+  else if(stage==="discovery"){
+    if(!hasProcess())active="process";
+    else if(!hasPain())active="pain";
+    else if(!hasImpact())active="pain";
+    else active="impact";
+  }
+  else if(stage==="qualify")active="fit";
+  else if(stage==="close")active=meetingBooked()?"meeting":"fit";
+  else if(stage==="wrap")active=hasFit()?"fit":"pain";
+  else if(stage==="done")active="meeting";
+  var h="";
+  PROGRESS.forEach(function(p){
+    var done=checks[p.key];
+    var isActive=active===p.key&&!done;
+    var cls=done?"done":(isActive?"active":"");
+    h+='<div class="progress-step '+cls+'"><div class="ps-k">'+esc(p.key)+'</div><div class="ps-v">'+esc(p.label)+'</div></div>';
+  });
+  var el=document.getElementById("progress-steps");
+  if(el)el.innerHTML=h;
+}
+
+// ── RENDER: MINI SUMMARY ──────────────────────────────────────────────────────
+function renderMiniSummary(){
+  var el=document.getElementById("mini-summary");if(!el)return;
+  var g=discoveryGate(),qc=qualCount();
+  if(hasPain()){
+    el.textContent="Pain: "+getPain()+". Gate: "+g+"/4. Qual: "+qc+"/"+MUST_QUAL.length+". Score: "+scoreTotal()+"/25.";
+  } else {
+    el.textContent="Summary will build as you click through the call.";
+  }
+}
+
+// ── RENDER: SCORE MATRIX ──────────────────────────────────────────────────────
+function renderScoreCard(){
+  var total=scoreTotal();
+  var st=document.getElementById("matrix-status");
+  var bd=document.getElementById("matrix-band");
+  var nx=document.getElementById("matrix-next");
+  if(st){st.textContent=total+" / 25";st.style.color=total>=20?"var(--green)":total>=15?"var(--amber)":"var(--text2)"}
+  if(bd)bd.innerHTML='Current band: <strong>'+scoreBand(total)+'</strong>. Target: <strong>20+</strong>. Click to mark manually.';
+  var miss=[];
+  SCORE_CATS.forEach(function(c){c.items.forEach(function(i){if(!scoreMet(i.id))miss.push(i.l)})});
+  if(nx){if(miss.length&&total<20){nx.classList.remove("hidden");nx.textContent="Next: "+miss.slice(0,3).join(" | ")}else{nx.classList.add("hidden")}}
+  var h="";
+  SCORE_CATS.forEach(function(cat){
+    var got=0,ih="";
+    cat.items.forEach(function(it){
+      var met=scoreMet(it.id);if(met)got++;
+      ih+='<button class="matrix-item '+(met?"done ":"")+(state.scoreManual[it.id]?"manual":"")+'" onclick="toggleScore(\''+it.id+'\')">'+(met?"&#x2713; ":"&#x25CB; ")+esc(it.l)+'</button>';
+    });
+    h+='<div class="matrix-cat"><div class="matrix-cat-head"><div class="matrix-cat-title">'+esc(cat.t)+'</div><div class="matrix-cat-score">'+got+' / '+cat.max+'</div></div><div class="matrix-items">'+ih+'</div></div>';
+  });
+  var el=document.getElementById("matrix-cats");if(el)el.innerHTML=h;
+}
+
+// ── RENDER: QUAL PILLS ────────────────────────────────────────────────────────
+function renderQualPills(){
+  var el=document.getElementById("qual-pills");
+  var st=document.getElementById("qual-status");
+  if(!el)return;
+  var h="";
+  MUST_QUAL.forEach(function(k){
+    var done=!!state.captures[k];
+    var label={primary_pain:"Pain",impact:"Impact",priority_timing:"Priority",accounting:"Accounts",headcount:"Headcount",worktype:"Fab vs install",dm_status:"DM"}[k]||k;
+    h+='<span class="qpill '+(done?"done":"warn")+'">'+label+'</span>';
+  });
+  el.innerHTML=h;
+  if(st){st.textContent=qualCount()+" / "+MUST_QUAL.length+" captured";st.style.color=qualCount()===MUST_QUAL.length?"var(--green)":"var(--text3)"}
+}
+
+// ── RENDER: CAPTURE GRID ──────────────────────────────────────────────────────
+function renderCaptureGrid(){
+  var el=document.getElementById("capture-grid");if(!el)return;
+  var h="";
+  QUAL_FIELDS.forEach(function(f){
+    var v=state.captures[f.key]||"";
+    h+='<div class="capture-item"><div class="capture-k">'+esc(f.label)+'</div><div class="capture-v '+(v?"ok":"")+'">'+esc(v||"—")+'</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+// ── RENDER: SUMMARY CARD ──────────────────────────────────────────────────────
+function summaryCard(isEnd){
+  var h='<div class="summary-card '+(isEnd?"end":"")+'"><div class="summary-title">'+(isEnd?"End of call summary":"Working summary")+'</div><div class="summary-text">';
+  h+='<strong>Factory score:</strong> '+scoreTotal()+' / 25 &mdash; '+scoreBand(scoreTotal())+'.<br>';
+  h+='<strong>Pain:</strong> '+esc(getPain())+'.<br>';
+  h+='<strong>Impact:</strong> '+esc(getImpact())+'.<br>';
+  h+='<strong>Priority:</strong> '+esc(state.captures.priority_timing||"Not captured")+'.<br>';
+  h+='<strong>Fit:</strong> '+esc([state.captures.accounting,state.captures.headcount,state.captures.worktype,state.captures.dm_status].filter(Boolean).join(" | ")||"Not fully qualified")+'.';
+  if(state.manualNotes&&state.manualNotes.trim())h+='<br><strong>Notes:</strong> '+esc(state.manualNotes.trim());
+  if(isEnd)h+='<div class="copy-btn"><button class="sfwd" onclick="copySummary(this)">Copy summary</button></div>';
+  h+='</div></div>';
+  return h;
+}
+function copySummary(btn){
+  var lines=["Call summary","Factory score: "+scoreTotal()+"/25 - "+scoreBand(scoreTotal()),"Pain: "+getPain(),"Impact: "+getImpact(),"Priority: "+(state.captures.priority_timing||"Not captured"),"Fit: "+([state.captures.accounting,state.captures.headcount,state.captures.worktype,state.captures.dm_status].filter(Boolean).join(" | ")||"Not qualified")];
+  if(state.manualNotes&&state.manualNotes.trim())lines.push("Notes: "+state.manualNotes.trim());
+  try{navigator.clipboard.writeText(lines.join("\n"));btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy summary"},1800)}catch(e){}
+}
+
+// ── RENDER: MAIN STEP ─────────────────────────────────────────────────────────
+function renderStep(){
+  var step=FLOW[state.current];
+  if(!step)return;
+  var el=document.getElementById("flow-content");
+  if(!canBook(state.current)){
+    var miss=missingBookGate().map(function(k){return({primary_pain:"Pain",impact:"Impact",priority_timing:"Priority",accounting:"Accounts",headcount:"Headcount",worktype:"Fab vs install",dm_status:"Decision-maker"}[k]||k)});
+    var msg=[];
+    if(discoveryGate()<4)msg.push("<strong>Discovery gate:</strong> "+discoveryGate()+" / 4 &mdash; still need: "+["process","pain","impact","priority"].filter(function(_,i){return[hasProcess(),hasPain(),hasImpact(),hasPriority()][i]===false}).join(", "));
+    if(miss.length)msg.push("<strong>Book gate:</strong> missing "+miss.join(", "));
+    el.innerHTML='<div class="gate"><div class="gate-icon">&#x1F512;</div><div class="gate-title">Not ready to book yet</div><div class="gate-desc">Complete the discovery gate and qualification before the demo ask.<div class="gate-miss">'+msg.join("<br>")+'</div></div><button class="gate-btn" onclick="goBack()">Go back and finish discovery</button></div>';
+    return;
+  }
+  var closeSteps=["transition","book_window","book_day","book_time","book_confirm","book_context"];
+  var isClose=closeSteps.indexOf(state.current)>=0;
+  var isEnd=(state.current==="end"||state.current==="qualify_out"||state.current==="sage_out"||state.current==="no_pain_wrap");
+  var stageLabel=({contact:"Gatekeeper",opener:"Opener",discovery:"Discovery",qualify:"Qualify",close:"Close",wrap:"Wrap",done:"Done"}[step.stage])||step.stage;
+  if(state.current==="start")stageLabel="Start here";
+  var h='<div class="fstep">';
+  h+='<div class="bc"><span class="bci on">'+esc(stageLabel)+'</span></div>';
+  h+='<div class="say"><div class="say-lbl">'+(state.current==="start"?"Start here":stageLabel==="Gatekeeper"?"Say this to reception":"Say this")+'</div><div class="say-txt">'+personalizeText(step.say)+'</div></div>';
+  if(isClose)h+=summaryCard(false);
+  if(isEnd)h+=summaryCard(true);
+  if(step.note)h+='<div class="snote">'+personalizeText(step.note)+'</div>';
+  if(step.resp&&step.resp.length){
+    var respLabel=state.current==="start"?"Who answered?":stageLabel==="Gatekeeper"?"Reception says / pick the closest:":step.stage==="discovery"?"What are you hearing? Pick the closest:":"They say / pick the closest:";
+    h+='<div class="rlbl">'+respLabel+'</div><div class="rgrid">';
+    step.resp.forEach(function(r,i){
+      var cls="rbtn";
+      if(r.tone==="pain")cls+=" rp";
+      else if(r.tone==="obj")cls+=" ro";
+      else if(r.tone==="good")cls+=" rg";
+      h+='<button class="'+cls+'" onclick="chooseResp(\''+esc(state.current)+'\','+i+')">'+esc(r.l)+'</button>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="snav">';
+  if(state.history.length)h+='<button class="sbk" onclick="goBack()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg>Back</button>';
+  else h+='<span></span>';
+  var digStages=["opener","discovery","wrap"];
+  if(digStages.indexOf(step.stage)>=0){
+    var probeOn=!!state.probe;
+    h+='<button class="dig-btn '+(probeOn?"on":"")+'" onclick="'+(probeOn?"closeProbe()":"openProbe()")+'">&#x1F50D; '+(probeOn?"Close probe":"Dig deeper")+'</button>';
+  } else {
+    h+='<span></span>';
+  }
+  h+='</div></div>';
+  el.innerHTML=h;
+}
+
+// ── RENDER: OBJECTION DRAWER ──────────────────────────────────────────────────
+function renderDrawer(){
+  var wrap=document.getElementById("odrawer");
+  var body=document.getElementById("odrawer-body");
+  if(!state.drawer){wrap.classList.add("hidden");return}
+  var key=state.drawer.key;
+  var h="";
+  if(key==="sendit"){
+    if(hasPain()){
+      h='<div class="lmono" style="color:var(--green)">Pain logged &mdash; push for the meeting</div>';
+      h+='<div class="sline" onclick="copyLine(this,\'Happy to send something.\')">Happy to send something.</div>';
+      h+='<div class="lmono">Isolate</div>';
+      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'Usually when someone says that after sharing what you just have - timing is off or I have not made it relevant enough yet. Which one is it?\')">Usually when someone says that after sharing what you just have &mdash; timing\'s off, or I haven\'t made it relevant enough yet. Which one is it?</div><div class="sline" onclick="copyLine(this,\'Just so I send something useful - what would you actually want it to cover?\')">Just so I send something useful &mdash; what would you actually want it to cover?</div></div>';
+      h+='<div class="lmono">Move &mdash; push for the call</div>';
+      h+='<div class="sline" onclick="copyLine(this,\'Look - the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it is not relevant, fair enough. Wednesday or Thursday?\')">Look &mdash; the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it\'s not relevant, fair enough. Wednesday or Thursday?</div>';
+      h+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="sfwd" onclick="handleObjContinue(\'book_window\')">They agreed &mdash; go to booking</button><button class="sfwd" onclick="handleObjContinue(\'transition\')">Back to meeting ask</button></div>';
+      h+='<div class="nblk" style="margin-top:12px"><strong>Pain already logged</strong>Do not route back to discovery. You have the pain &mdash; push for the meeting. Do not accept the email.</div>';
+    } else {
+      h='<div class="lmono">No pain yet &mdash; use it to open discovery</div>';
+      h+='<div class="sline" onclick="copyLine(this,\'Yeah I can absolutely do that.\')">Yeah I can absolutely do that.</div>';
+      h+='<div class="lmono">Isolate</div>';
+      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'Just so I send something useful rather than generic - what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?\')">Just so I send something useful rather than generic &mdash; what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?</div><div class="sline" onclick="copyLine(this,\'Usually that means timing is off or I have not made it relevant enough yet. Which one is it?\')">Usually that means timing\'s off, or I haven\'t made it relevant enough yet. Which one is it?</div></div>';
+      h+='<div class="lmono">Deepen</div>';
+      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'And how are you managing that at the moment?\')">And how are you managing that at the moment?</div><div class="sline" onclick="copyLine(this,\'How much time does that eat up in a normal week?\')">How much time does that eat up in a normal week?</div></div>';
+      h+='<div class="lmono">Move</div>';
+      h+='<div class="sline" onclick="copyLine(this,\'Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes - Wednesday or Thursday?\')">Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes &mdash; Wednesday or Thursday?</div>';
+      h+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="sfwd" onclick="handleObjContinue(\'process_map\')">Back to discovery</button><button class="sfwd" onclick="handleObjContinue(\'transition\')">Handled &mdash; try meeting ask</button></div>';
+      h+='<div class="nblk" style="margin-top:12px"><strong>Never do this</strong>Do not ask for the email before pushing back at least once. The second you ask for the email, you have accepted the brush-off.</div>';
+    }
+    body.innerHTML=h;
+    wrap.classList.remove("hidden");
+    wrap.scrollIntoView({behavior:"smooth",block:"nearest"});
+    return;
+  }
+  var o=OBJS[key];
+  if(!o){wrap.classList.add("hidden");return}
+  h='<div class="aim-block"><div class="ac aa"><div class="al">Acknowledge</div><div class="at">'+esc(o.a)+'</div></div><div class="ac ai"><div class="al">Isolate</div><div class="at">'+esc(o.i)+'</div></div><div class="ac am"><div class="al">Move forward</div><div class="at">'+esc(o.m)+'</div></div></div>';
+  h+='<div class="fblock"><strong>Fallback</strong>'+esc(o.f)+'</div>';
+  if(o.rs)h+='<div style="margin-top:12px"><button class="sfwd" onclick="handleObjContinue(\''+o.rs+'\')">Objection handled &mdash; continue</button></div>';
+  body.innerHTML=h;
+  wrap.classList.remove("hidden");
+  wrap.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+// ── RENDER: PROBE PANEL ───────────────────────────────────────────────────────
+function renderProbePanel(){
+  if(!state.probe){document.getElementById("probe-panel").classList.add("hidden");return}
+  var catsEl=document.getElementById("probe-cats");
+  var qEl=document.getElementById("probe-questions");
+  if(!catsEl||!qEl)return;
+  var h="";
+  Object.keys(PROBE_BANKS).forEach(function(key){
+    var b=PROBE_BANKS[key];
+    var on=state.probe&&state.probe.cat===key;
+    h+='<button class="probe-cat '+(on?"on":"")+'" onclick="selectProbeCat(\''+key+'\')">'+esc(b.label)+'</button>';
+  });
+  catsEl.innerHTML=h;
+  if(state.probe&&state.probe.cat){
+    var bank=PROBE_BANKS[state.probe.cat];
+    var qh='<div class="probe-note">'+esc(bank.note)+'</div>';
+    bank.questions.forEach(function(q){
+      qh+='<div class="probe-q" onclick="copyLine(this,\''+q.replace(/'/g,"\\'")+'\')">&ldquo;'+esc(q)+'&rdquo;</div>';
+    });
+    qh+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">';
+    qh+='<button class="sfwd" onclick="handleProbeAdmission()">Got the admission &mdash; name the pain</button>';
+    qh+='</div>';
+    qEl.innerHTML=qh;
+  } else {
+    qEl.innerHTML='';
+  }
+}
+
+
+function renderAll(){
+  renderGateBar();
+  renderProgress();
+  renderMiniSummary();
+  renderScoreCard();
+  renderQualPills();
+  renderCaptureGrid();
+  renderStep();
+  renderDrawer();
+  renderProbePanel();
+}
+
+// ── VIEW SWITCHING ─────────────────────────────────────────────────────────────
+function showView(id){
+  ["flow","opener","discovery","qualify","objections","book"].forEach(function(v){
+    document.getElementById("view-"+v).classList.remove("active");
+    document.getElementById("nav-"+v).classList.remove("active");
+  });
+  document.getElementById("view-"+id).classList.add("active");
+  document.getElementById("nav-"+id).classList.add("active");
+  document.querySelector(".main").scrollTop=0;
+}
+
+// ── REFERENCE TAB OBJECTIONS ───────────────────────────────────────────────────
+function showRObj(key){
+  document.getElementById("robj-list").classList.add("hidden");
+  document.getElementById("robj-detail").classList.remove("hidden");
+  if(key==="sendit"){
+    document.getElementById("robj-normal").classList.add("hidden");
+    document.getElementById("robj-sendit").classList.remove("hidden");
+  } else {
+    document.getElementById("robj-normal").classList.remove("hidden");
+    document.getElementById("robj-sendit").classList.add("hidden");
+    var o=OBJS[key];
+    if(o){
+      document.getElementById("robj-title").textContent=o.t;
+      document.getElementById("robj-ack").textContent=o.a;
+      document.getElementById("robj-iso").textContent=o.i;
+      document.getElementById("robj-move").textContent=o.m;
+      document.getElementById("robj-fallback").textContent=o.f;
+    }
+  }
+}
+function hideRObj(){
+  document.getElementById("robj-list").classList.remove("hidden");
+  document.getElementById("robj-detail").classList.add("hidden");
+}
+
+function copyLine(el,text){
+  try{navigator.clipboard.writeText(text)}catch(e){}
+  el.classList.add("copied");
+  setTimeout(function(){el.classList.remove("copied")},1500);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────────
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeDrawer();closeProbe()}});
+resetCall();
+</script>
+</body>
+</html>
