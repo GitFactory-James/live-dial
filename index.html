@@ -307,7 +307,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <button class="nav-btn" onclick="showView('book')" id="nav-book">Book It</button>
   </div>
   <div class="hdr-r">
-    <button class="version-badge" onclick="openChangelog()" title="View changelog">v1.0.3</button>
+    <button class="version-badge" onclick="openChangelog()" title="View changelog">v1.0.4</button>
     <span class="dm-label" onclick="toggleDark()">Dark</span>
     <div class="dm-toggle" onclick="toggleDark()" title="Toggle dark mode" role="switch"></div>
   </div>
@@ -475,23 +475,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
       <div class="fblock"><strong>Fallback</strong><span id="robj-fallback"></span></div>
     </div>
-    <div id="robj-sendit" class="hidden">
-      <div class="lmono" style="margin-top:0;color:var(--green)">Pain already logged &mdash; push for the meeting</div>
-      <div class="sline" onclick="copyLine(this,'Happy to send something.')">"Happy to send something."</div>
-      <div class="lmono">Isolate</div>
-      <div class="sgrid">
-        <div class="sline" onclick="copyLine(this,'Usually when someone says that after sharing what you just have - timing is off or I have not made it relevant enough yet. Which one is it?')">"Usually when someone says that after sharing what you just have &mdash; timing's off, or I haven't made it relevant enough yet. Which one is it?"</div>
-        <div class="sline" onclick="copyLine(this,'Just so I send something useful - what would you actually want it to cover?')">"Just so I send something useful &mdash; what would you actually want it to cover?"</div>
-      </div>
-      <div class="lmono">Move &mdash; push for the call</div>
-      <div class="sline" onclick="copyLine(this,'Look - the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it is not relevant, fair enough. Wednesday or Thursday?')">"Look &mdash; the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it's not relevant, fair enough. Wednesday or Thursday?"</div>
-      <div class="divider"></div>
-      <div class="lmono" style="color:var(--text3)">No pain yet &mdash; use it to open discovery</div>
-      <div class="sline" onclick="copyLine(this,'Just so I send something useful - what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?')">"Just so I send something useful &mdash; what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?"</div>
-      <div class="sline" onclick="copyLine(this,'Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes - Wednesday or Thursday?')">"Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes &mdash; Wednesday or Thursday?"</div>
-      <div class="divider"></div>
-      <div class="nblk"><strong>Never do this</strong>Do not ask for the email before pushing back at least once. The second you ask for the email, you have accepted the brush-off.</div>
-    </div>
+    
   </div>
 </div>
 
@@ -519,12 +503,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 // Add new entries at the TOP of this array. Fields: version, date, tag, changes[]
 var CHANGELOG = [
   {
-    version: "v1.0.3",
+    version: "v1.0.4",
     date: "Jun 2025",
     tag: "latest",
     changes: [
-      "Removed hardcoded SDR name: James replaced with [Your name] throughout",
-      "[Your name] now highlights in amber in live flow cards alongside [pain] and [impact]"
+      "Send me something objection unified: now uses standard AIM layout in both live flow and reference tab",
+      "Live drawer auto-selects pain vs no-pain content based on discovery gate state",
+      "Removed ~4000 chars of custom rendering code and the standalone robj-sendit HTML block"
+    ]
+  },
+  {
+    version: "v1.0.3",
+    date: "Jun 2025",
+    tag: "",
+    changes: [
+      "Removed hardcoded SDR name — James replaced with [Your name] throughout",
+      "[Your name] highlights in amber in live flow alongside [pain] and [impact]"
     ]
   },
   {
@@ -532,8 +526,7 @@ var CHANGELOG = [
     date: "Jun 2025",
     tag: "",
     changes: [
-      "Opener rewrite: quote-through-to-invoice framing, tighter pain list, cleaner question",
-      "Removed positioning filler, fixed grammar, kept casual tone"
+      "Opener rewrite: quote-through-to-invoice framing, tighter pain list, cleaner question"
     ]
   },
   {
@@ -541,8 +534,7 @@ var CHANGELOG = [
     date: "Jun 2025",
     tag: "",
     changes: [
-      "Opener tweaked: removed em dashes, broadened geographic scope, tighter structure",
-      "Version scheme updated to semver"
+      "Opener tweaked: removed em dashes, broadened scope, version scheme updated to semver"
     ]
   },
   {
@@ -550,8 +542,7 @@ var CHANGELOG = [
     date: "Jun 2025",
     tag: "",
     changes: [
-      "Opener rewrite: replaced Nice one line with Factory-specific positioning intro",
-      "Updated across live flow opener_context step and Opener reference tab"
+      "Opener rewrite: Factory-specific positioning intro"
     ]
   },
   {
@@ -559,8 +550,7 @@ var CHANGELOG = [
     date: "Jun 2025",
     tag: "",
     changes: [
-      "Logo: fixed brand wordmark, displays correctly in light and dark mode",
-      "Version badge added to header with changelog modal"
+      "Logo fixed, version badge and changelog modal added"
     ]
   },
   {
@@ -568,8 +558,7 @@ var CHANGELOG = [
     date: "Jun 2025",
     tag: "",
     changes: [
-      "UI tweaks and layout polish across the live call flow",
-      "Pain extraction probe panel refinements"
+      "UI tweaks and pain extraction probe panel refinements"
     ]
   }
 ];
@@ -880,7 +869,10 @@ var OBJS = {
   think:{t:"Need to think about it",a:"Yeah completely, I don't want you to rush into anything.",i:"Usually when someone says that, there's one thing they're not fully sold on yet. Is it more that you're not sure it would actually solve the problem, or is it more that you're cautious about making a change?",m:"After what we've covered - does it feel like it would actually help? If yes, what's genuinely holding you back - is it the price, timing, or just nerves about the change?",f:"What would need to happen between now and us speaking again for you to feel comfortable making a call on it?",rs:"book_window"},
   trial:{t:"Want a trial first",a:"Yeah totally get it - you want to see it properly before committing, that makes sense.",i:"When you say a trial - are you worried it doesn't do something specific you need, or is it more just that you want a bit more comfort that it'll work for your setup?",m:"What if you sent me over a sample job or sales order - I'll mock it up in Factory using your actual layout, and we can walk through it together. Does that work?",f:"What specifically would you be testing, and what would need to happen for you to feel confident it's the right fit?",rs:"transition"},
   rollout:{t:"Too much effort to roll out",a:"Yeah that's a fair concern - any change like this takes some effort upfront.",i:"The question is really whether the effort is worth the outcome. If it sorts out the problem, is a few weeks of setup time worth it to you?",m:"The way our onboarding works is we do most of the heavy lifting - you guide us on how your jobs run, we set it up. Most shops are up and running within a few weeks.",f:"What would make you feel confident that we'd handle the implementation properly?",rs:"transition"},
-  change:{t:"Team won't use it",a:"Yeah, getting a team to change how they do things is always the hardest part.",i:"Is the worry that the system itself is too complicated, or more that the guys on the floor just won't bother with it?",m:"The guys on the floor are updating a job status on a screen or tablet. Designed to be as simple as possible for the people most resistant to it.",f:"What level of simplicity would the team need for it to actually get used day-to-day?",rs:"transition"}
+  change:{t:"Team won't use it",a:"Yeah, getting a team to change how they do things is always the hardest part.",i:"Is the worry that the system itself is too complicated, or more that the guys on the floor just won't bother with it?",m:"The guys on the floor are updating a job status on a screen or tablet. Designed to be as simple as possible for the people most resistant to it.",f:"What level of simplicity would the team need for it to actually get used day-to-day?",rs:"transition"},
+  sendit:{t:"Send me something",a:"Happy to send something over.",i:"Usually when someone says that after sharing what you just have — timing's off, or I haven't made it relevant enough yet. Which one is it?",m:"The quickest way to see if it's worth your time is a focused 15-minute walkthrough on exactly that. If it's not relevant, fair enough. Wednesday or Thursday?",f:"Don't ask for their email before pushing back at least once. The second you ask, you've accepted the brush-off.",rs:"transition"},
+  sendit_pain:{t:"Send me something",a:"Happy to send something over.",i:"Usually when someone says that after sharing what you just have — timing's off, or I haven't made it relevant enough yet. Which one is it?",m:"The quickest way to see if it's worth your time is a focused 15-minute walkthrough on exactly that. If it's not relevant, fair enough. Wednesday or Thursday?",f:"Pain already logged — don't route back to discovery. You have the pain, push for the meeting. Don't accept the email.",rs:"book_window"},
+  sendit_nopain:{t:"Send me something",a:"Yeah, happy to send something over.",i:"Just so I send something useful — what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?",m:"Honestly, easier to just show you that bit live rather than guess over email. 15 minutes — Wednesday or Thursday?",f:"No pain logged yet — don't agree to send before pushing back at least once. The second you ask for the email, you've accepted the brush-off.",rs:"process_map"}
 };
 
 // ── PAIN EXTRACTION PROBE BANKS ───────────────────────────────────────────────
@@ -1223,33 +1215,7 @@ function renderDrawer(){
   if(!state.drawer){wrap.classList.add("hidden");return}
   var key=state.drawer.key;
   var h="";
-  if(key==="sendit"){
-    if(hasPain()){
-      h='<div class="lmono" style="color:var(--green)">Pain logged &mdash; push for the meeting</div>';
-      h+='<div class="sline" onclick="copyLine(this,\'Happy to send something.\')">Happy to send something.</div>';
-      h+='<div class="lmono">Isolate</div>';
-      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'Usually when someone says that after sharing what you just have - timing is off or I have not made it relevant enough yet. Which one is it?\')">Usually when someone says that after sharing what you just have &mdash; timing\'s off, or I haven\'t made it relevant enough yet. Which one is it?</div><div class="sline" onclick="copyLine(this,\'Just so I send something useful - what would you actually want it to cover?\')">Just so I send something useful &mdash; what would you actually want it to cover?</div></div>';
-      h+='<div class="lmono">Move &mdash; push for the call</div>';
-      h+='<div class="sline" onclick="copyLine(this,\'Look - the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it is not relevant, fair enough. Wednesday or Thursday?\')">Look &mdash; the quickest way to see if this is worth your time is a focused 15-minute walkthrough on that exact issue. If it\'s not relevant, fair enough. Wednesday or Thursday?</div>';
-      h+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="sfwd" onclick="handleObjContinue(\'book_window\')">They agreed &mdash; go to booking</button><button class="sfwd" onclick="handleObjContinue(\'transition\')">Back to meeting ask</button></div>';
-      h+='<div class="nblk" style="margin-top:12px"><strong>Pain already logged</strong>Do not route back to discovery. You have the pain &mdash; push for the meeting. Do not accept the email.</div>';
-    } else {
-      h='<div class="lmono">No pain yet &mdash; use it to open discovery</div>';
-      h+='<div class="sline" onclick="copyLine(this,\'Yeah I can absolutely do that.\')">Yeah I can absolutely do that.</div>';
-      h+='<div class="lmono">Isolate</div>';
-      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'Just so I send something useful rather than generic - what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?\')">Just so I send something useful rather than generic &mdash; what would you most want it to show? Quoting, job tracking, paperwork, or visibility on the floor?</div><div class="sline" onclick="copyLine(this,\'Usually that means timing is off or I have not made it relevant enough yet. Which one is it?\')">Usually that means timing\'s off, or I haven\'t made it relevant enough yet. Which one is it?</div></div>';
-      h+='<div class="lmono">Deepen</div>';
-      h+='<div class="sgrid"><div class="sline" onclick="copyLine(this,\'And how are you managing that at the moment?\')">And how are you managing that at the moment?</div><div class="sline" onclick="copyLine(this,\'How much time does that eat up in a normal week?\')">How much time does that eat up in a normal week?</div></div>';
-      h+='<div class="lmono">Move</div>';
-      h+='<div class="sline" onclick="copyLine(this,\'Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes - Wednesday or Thursday?\')">Honestly rather than guessing over email, easier to just show you that bit live. 15 minutes &mdash; Wednesday or Thursday?</div>';
-      h+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="sfwd" onclick="handleObjContinue(\'process_map\')">Back to discovery</button><button class="sfwd" onclick="handleObjContinue(\'transition\')">Handled &mdash; try meeting ask</button></div>';
-      h+='<div class="nblk" style="margin-top:12px"><strong>Never do this</strong>Do not ask for the email before pushing back at least once. The second you ask for the email, you have accepted the brush-off.</div>';
-    }
-    body.innerHTML=h;
-    wrap.classList.remove("hidden");
-    wrap.scrollIntoView({behavior:"smooth",block:"nearest"});
-    return;
-  }
+  if(key==="sendit")key=hasPain()?"sendit_pain":"sendit_nopain";
   var o=OBJS[key];
   if(!o){wrap.classList.add("hidden");return}
   h='<div class="aim-block"><div class="ac aa"><div class="al">Acknowledge</div><div class="at">'+esc(o.a)+'</div></div><div class="ac ai"><div class="al">Isolate</div><div class="at">'+esc(o.i)+'</div></div><div class="ac am"><div class="al">Move forward</div><div class="at">'+esc(o.m)+'</div></div></div>';
@@ -1316,20 +1282,14 @@ function showView(id){
 function showRObj(key){
   document.getElementById("robj-list").classList.add("hidden");
   document.getElementById("robj-detail").classList.remove("hidden");
-  if(key==="sendit"){
-    document.getElementById("robj-normal").classList.add("hidden");
-    document.getElementById("robj-sendit").classList.remove("hidden");
-  } else {
-    document.getElementById("robj-normal").classList.remove("hidden");
-    document.getElementById("robj-sendit").classList.add("hidden");
-    var o=OBJS[key];
-    if(o){
-      document.getElementById("robj-title").textContent=o.t;
-      document.getElementById("robj-ack").textContent=o.a;
-      document.getElementById("robj-iso").textContent=o.i;
-      document.getElementById("robj-move").textContent=o.m;
-      document.getElementById("robj-fallback").textContent=o.f;
-    }
+  document.getElementById("robj-normal").classList.remove("hidden");
+  var o=OBJS[key];
+  if(o){
+    document.getElementById("robj-title").textContent=o.t;
+    document.getElementById("robj-ack").textContent=o.a;
+    document.getElementById("robj-iso").textContent=o.i;
+    document.getElementById("robj-move").textContent=o.m;
+    document.getElementById("robj-fallback").textContent=o.f;
   }
 }
 function hideRObj(){
