@@ -288,6 +288,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cl-changes{list-style:none;display:flex;flex-direction:column;gap:5px}
 .cl-changes li{font-size:13px;color:var(--text2);padding-left:14px;position:relative;line-height:1.55}
 .cl-changes li::before{content:"\B7";position:absolute;left:2px;color:var(--text3)}
+.sdr-slot{color:var(--amber);font-weight:600}
 </style>
 </head>
 <body>
@@ -306,7 +307,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <button class="nav-btn" onclick="showView('book')" id="nav-book">Book It</button>
   </div>
   <div class="hdr-r">
-    <button class="version-badge" onclick="openChangelog()" title="View changelog">v1.0.2</button>
+    <button class="version-badge" onclick="openChangelog()" title="View changelog">v1.0.3</button>
     <span class="dm-label" onclick="toggleDark()">Dark</span>
     <div class="dm-toggle" onclick="toggleDark()" title="Toggle dark mode" role="switch"></div>
   </div>
@@ -373,9 +374,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="view-opener" class="view">
   <div class="sec-head"><span class="sec-num">REF</span><span class="sec-title">Opener</span><span class="sec-sub">short, relevant, then shut up</span></div>
   <div class="label">Standard cold call</div>
-  <div class="card"><div class="cbody"><span class="q">"Hey [Name], it's James from Factory. Sorry for the out-of-the-blue call &mdash; have I caught you at a bad time?"</span><br><br><em>If okay:</em><br><br><span class="q">&ldquo;I&rsquo;ll keep it brief. At Factory, we help fabrication businesses get control of jobs from quote through to invoice, without relying on spreadsheets, paper job cards, or systems that don&rsquo;t talk to each other. The shops we work with are usually losing time to admin, double handling, or just not knowing where live jobs are at. How are you guys managing and tracking jobs at the moment?&rdquo;</span></div></div>
+  <div class="card"><div class="cbody"><span class="q">"Hey [Name], it's [Your name] from Factory. Sorry for the out-of-the-blue call &mdash; have I caught you at a bad time?"</span><br><br><em>If okay:</em><br><br><span class="q">&ldquo;I&rsquo;ll keep it brief. At Factory, we help fabrication businesses get control of jobs from quote through to invoice, without relying on spreadsheets, paper job cards, or systems that don&rsquo;t talk to each other. The shops we work with are usually losing time to admin, double handling, or just not knowing where live jobs are at. How are you guys managing and tracking jobs at the moment?&rdquo;</span></div></div>
   <div class="cgrid">
-    <div class="card"><div class="ctag">Transferred opener</div><div class="cbody"><span class="q">"Hey [Name], it's James from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?"</span></div></div>
+    <div class="card"><div class="ctag">Transferred opener</div><div class="cbody"><span class="q">"Hey [Name], it's [Your name] from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?"</span></div></div>
     <div class="card"><div class="ctag">Rushed version</div><div class="cbody"><span class="q">"No worries &mdash; I'll be brief. We help fabrication shops tighten up quoting, job tracking and paperwork where things are still manual. How are you managing that at the moment?"</span></div></div>
   </div>
   <div class="label">They ask what Factory does</div>
@@ -518,9 +519,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 // Add new entries at the TOP of this array. Fields: version, date, tag, changes[]
 var CHANGELOG = [
   {
-    version: "v1.0.2",
+    version: "v1.0.3",
     date: "Jun 2025",
     tag: "latest",
+    changes: [
+      "Removed hardcoded SDR name: James replaced with [Your name] throughout",
+      "[Your name] now highlights in amber in live flow cards alongside [pain] and [impact]"
+    ]
+  },
+  {
+    version: "v1.0.2",
+    date: "Jun 2025",
+    tag: "",
     changes: [
       "Opener rewrite: quote-through-to-invoice framing, tighter pain list, cleaner question",
       "Removed positioning filler, fixed grammar, kept casual tone"
@@ -598,7 +608,7 @@ var FLOW = {
     {l:"Reception / gatekeeper",n:"gk_open"},
     {l:"Decision-maker direct",n:"opener",tone:"good",score:["open_courtesy"]}
   ]},
-  gk_open:{stage:"contact",say:"Hi, it's James calling from Factory. I was hoping to speak with [Name] if they're available.",note:"Do not pitch reception unless they ask what it's regarding.",resp:[
+  gk_open:{stage:"contact",say:"Hi, it's [Your name] calling from Factory. I was hoping to speak with [Name] if they're available.",note:"Do not pitch reception unless they ask what it's regarding.",resp:[
     {l:"They ask what it's regarding",n:"gk_context"},
     {l:"They ask who you are / what company",n:"gk_context"},
     {l:"They can transfer you",n:"opener_transfer",tone:"good"},
@@ -658,12 +668,12 @@ var FLOW = {
     {l:"They soften / can transfer",n:"opener_transfer",tone:"good"}
   ]},
 
-  opener_transfer:{stage:"opener",say:"Hey [Name], it's James from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?",note:"They've been transferred - keep it clean. If they say go ahead, straight into Factory positioning.",resp:[
+  opener_transfer:{stage:"opener",say:"Hey [Name], it's [Your name] from Factory. I was just speaking with reception and they put me through. Have I caught you at a bad time?",note:"They've been transferred - keep it clean. If they say go ahead, straight into Factory positioning.",resp:[
     {l:"Go ahead / not a bad time",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]},
     {l:"Bad time / rushed",n:"rushed"},
     {l:"They know Factory / seen us before",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]}
   ]},
-  opener:{stage:"opener",say:"Hey [Name], it's James from Factory. Sorry for the out-of-the-blue call - have I caught you at a bad time?",note:"Wait. If yes: say no worries and end. If no, go straight into positioning. Do not ask permission twice.",resp:[
+  opener:{stage:"opener",say:"Hey [Name], it's [Your name] from Factory. Sorry for the out-of-the-blue call - have I caught you at a bad time?",note:"Wait. If yes: say no worries and end. If no, go straight into positioning. Do not ask permission twice.",resp:[
     {l:"Go ahead / not a bad time",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]},
     {l:"Bad time / rushed",n:"rushed"},
     {l:"They know Factory / seen us before",n:"opener_context",tone:"good",score:["open_courtesy","open_permission"]}
@@ -982,7 +992,8 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function personalizeText(txt){
   return esc(txt)
     .replace(/\[pain\]/gi,'<span class="auto-pain">'+esc(getPain())+'</span>')
-    .replace(/\[impact\]/gi,'<span class="auto-pain">'+esc(getImpact())+'</span>');
+    .replace(/\[impact\]/gi,'<span class="auto-pain">'+esc(getImpact())+'</span>')
+    .replace(/\[Your name\]/gi,'<span class="sdr-slot">[Your name]</span>');
 }
 
 // ── SCORING ────────────────────────────────────────────────────────────────────
